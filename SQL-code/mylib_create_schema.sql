@@ -10,9 +10,10 @@ CREATE TABLE school(
     city VARCHAR(40),
     phone_number VARCHAR(20),
     email VARCHAR(255),
-    principal VARCHAR(80)
-    CONSTRAINT check_postcode CHECK (postcode REGEXP '^(\d{3} ?\d{2}|NULL)$'),
-    CONSTRAINT check_phone_number CHECK (phone_number REGEXP '^((+\d{1,3})? ?\d{10}|NULL)$'),
+    principal VARCHAR(80),
+    CONSTRAINT check_postcode CHECK (postcode REGEXP '^([0-9]{3} ?[0-9]{2}|NULL)$'),
+    CONSTRAINT check_phone_number CHECK (phone_number REGEXP '^[0-9]{10}$'),
+    -- CONSTRAINT check_phone_number CHECK (phone_number REGEXP '^((+\[0-9]{1,3})? ?\[0-9]{10}|NULL)$'),
     CONSTRAINT check_email CHECK (email REGEXP '^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}|NULL)$')
 );
 
@@ -26,8 +27,8 @@ CREATE TABLE app_user(
     username VARCHAR(30) UNIQUE,
     user_password VARCHAR(255),
     is_active BOOLEAN DEFAULT 0,
-    FOREIGN KEY(school) REFERENCES school(id) ON DELETE CASCADE,
-    CONSTRAINT check_birthdate CHECK (birthdate < CURDATE())
+    FOREIGN KEY(school) REFERENCES school(id) ON DELETE CASCADE
+    -- CONSTRAINT check_birthdate CHECK (birthdate < NOW())
 );
 
 CREATE TABLE Book(
@@ -41,7 +42,7 @@ CREATE TABLE Book(
                 'health', 'history', 'literature', 'math', 'mystery', 'poetry', 'romance', 'science', 'science fiction',
                 'sociology', 'technology', 'thriller', 'travel') NOT NULL, 
     abstract TEXT,
-    image BLOB, 
+    image BLOB,
     lang ENUM ('Ελληνικά', 'Αγγλικά', 'Γαλλικά', 'Γερμανικά', 'Ξένα') DEFAULT 'Ελληνικά',
     keywords TEXT,
     CONSTRAINT check_isbn CHECK (isbn REGEXP '^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$'), 
