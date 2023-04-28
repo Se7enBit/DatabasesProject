@@ -9,13 +9,19 @@ from flask import (
     current_app,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import (
+    login_required,
+    login_user,
+    logout_user,
+    current_user,
+)
+from . import login_manager
 
 auth = Blueprint("auth", __name__)
-db = current_app.config["db"]
 
 
 def authenticate():
+    db = current_app.config["MYSQL_DB"]
     if "username" not in session:
         return render_template("login.html")
 
@@ -43,6 +49,7 @@ class User:
 
     @staticmethod
     def get(user_id):
+        db = current_app.config["MYSQL_DB"]
         cur = db.connection.cursor()
         cur.execute("SELECT * FROM users WHERE id = %s", [user_id])
         user = cur.fetchone()
@@ -54,6 +61,7 @@ class User:
 
     @staticmethod
     def authenticate(username, password):
+        db = current_app.config["MYSQL_DB"]
         cur = db.connection.cursor()
         cur.execute("SELECT * FROM users WHERE username = %s", [username])
         user = cur.fetchone()
@@ -117,6 +125,7 @@ def sign_up():
         else:
             # add user to database
             password = generate_password_hash(password1, method="sha256")
+            db = current_app.config["MYSQL_DB"]
             cur = db.connection.cursor()
             cur.execute(
                 "INSERT INTO users (username, email, password) VALUES (%s, %s)",
@@ -130,3 +139,14 @@ def sign_up():
             flash("Account created.", category="success")
             return redirect(url_for("views.home"))
     return render_template("sign_up.html", user=current_user)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db = current_app.config["MYSQL_DB"]
+    cur = db.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    if user:
+        return User(user["id"], user["username"], user["email"], user["password"])
