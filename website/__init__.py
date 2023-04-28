@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
-from os import path
+from . import config
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import (
     LoginManager,
@@ -13,12 +13,13 @@ from flask_login import (
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "dbdbdbdb"
+    app.config.from_object("config")
+    # app.secret_key = "dbdbdbdb"
 
-    app.config["MYSQL_USER"] = "username"
-    app.config["MYSQL_PASSWORD"] = "password"
-    app.config["MYSQL_DB"] = "school_library"
-    app.config["MYSQL_HOST"] = "localhost"
+    # app.config["MYSQL_USER"] = "username"
+    # app.config["MYSQL_PASSWORD"] = "password"
+    # app.config["MYSQL_DB"] = "school_library"
+    # app.config["MYSQL_HOST"] = "localhost"
 
     db = MySQL(app)
 
@@ -32,4 +33,4 @@ def create_app():
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
 
-    return app, db
+    return app
