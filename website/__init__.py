@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "dbdbdbdb"
 
 app.config["MYSQL_USER"] = "username"
-app.config["MYSQL_PASSWORD"] = "password"
+app.config["MYSQL_PASSWORD"] = ""
 app.config["MYSQL_DB"] = "school_library"
 app.config["MYSQL_HOST"] = "localhost"
 
