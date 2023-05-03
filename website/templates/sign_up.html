@@ -3,6 +3,60 @@
 <form method="POST">
   <h3 align="center">Sign Up</h3>
   <div class="form-group">
+    <label for="first_name">First Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="first_name"
+      name="first_name"
+      placeholder="Enter first name"
+    />
+  </div>
+  <div class="form-group">
+    <label for="last_name">Last Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="last_name"
+      name="last_name"
+      placeholder="Enter last name"
+    />
+  </div>
+  <div class="form-group">
+    <label for="birthdate">Birthdate</label>
+    <input
+      type="date"
+      class="form-control"
+      id="birthdate"
+      name="birthdate"
+      placeholder="Enter birthdate"
+    />
+  </div>
+  <div class="form-group">
+    <label for="school">School</label>
+    <select
+      class="form-control"
+      id="school"
+      name="school"
+    >
+      {% for school in schools %}
+      <option value="{{ school[0] }}">{{ school[1] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="user_role">User Role</label>
+    <select
+      class="form-control"
+      id="user_role"
+      name="user_role"
+    >
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="school_admin">Librarian</option>
+    </select>
+  </div>
+  <div class="form-group">
     <label for="username">Username</label>
     <input
       type="username"

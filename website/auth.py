@@ -20,7 +20,7 @@ from . import login_manager, db
 auth = Blueprint("auth", __name__)
 
 """
-def authenticate():
+def get_user_role():
     db = current_app.config["MYSQL_DB"]
     if "username" not in session:
         return render_template("login.html")
@@ -66,12 +66,13 @@ class User:
         user = cur.fetchone()
         cur.close()
 
-        authorized_user = User(
+        if user:
+            authorized_user = User(
             user[0], user[7], user[8], user[6], True
         )
-        #if check_password_hash(user[8], password):
-        if (user[8]==password):
-            return authorized_user
+            #if check_password_hash(user[8], password):
+            if (user[8]==password):
+                return authorized_user
         else:
             return None
 
@@ -102,17 +103,28 @@ def logout():
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
+    cur = db.connection.cursor()
+    cur.execute("SELECT * FROM school")
+    schools = cur.fetchall()
+    cur.close()
+
     if request.method == "POST":
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        birthdate = request.form.get("birthdate") #schould be a birthdate form
+        school = request.form.get("school") #returns school.id
+        user_role = request.form.get("user_role") #select from 3 options
+
         username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
         cur = db.connection.cursor()
         cur.execute("SELECT * FROM app_user WHERE username = %s", [username])
-        username = cur.fetchone()
+        app_user = cur.fetchone()
         cur.close()
 
-        if username:
+        if app_user:
             flash("Username already exists.", category="error")
         if len(username) < 4:
             flash("Username must be greater than 3 character.", category="error")
@@ -122,20 +134,21 @@ def sign_up():
             flash("Password must be at least 7 characters", category="error")
         else:
             # add user to database
-            password = generate_password_hash(password1, method="sha256")
+            #password = generate_password_hash(password1, method="sha256")
             cur = db.connection.cursor()
             cur.execute(
-                "INSERT INTO app_user (username, userpassword) VALUES (%s, %s)",
-                (username, password),
+                "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (first_name, last_name, birthdate, school, user_role, username, password1),
             )
             db.connection.commit()
             cur.close()
 
-            user = User.authenticate(username, password)
+            user = User.authenticate(username, password1)
             login_user(user, remember=True)
             flash("Account created.", category="success")
             return redirect(url_for("views.home"))
-    return render_template("sign_up.html", user=current_user)
+    else:
+        return render_template("sign_up.html", user=current_user, schools=schools)
 
 
 @login_manager.user_loader
