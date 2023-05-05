@@ -8,3 +8,8 @@ for future use QUERY to activate a user:
 UPDATE app_user
 SET is_active = 1
 WHERE username = "user_to_be_activated";
+
+get books per school:
+SELECT book_copies_per_school.\*
+FROM book_copies_per_school
+WHERE book_copies_per_school.school_id = "school_id(placeholder)";

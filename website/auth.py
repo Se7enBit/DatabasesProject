@@ -86,6 +86,9 @@ def login():
         password = request.form["password"]
         user = User.authenticate(username, password)
 
+        if not user.is_active:
+            return redirect(url_for("auth.waiting_room", username=username, password=password))
+
         if not user:
             flash("Invalid username or password", category="error")
             return render_template("login.html", user=current_user)
@@ -146,9 +149,21 @@ def sign_up():
             user = User.authenticate(username, password1)
             login_user(user, remember=True)
             flash("Account created.", category="success")
-            return redirect(url_for("views.home"))
+            return redirect(url_for("auth.waiting_room", username=username, password=password1))
+  
+    return render_template("sign_up.html", user=current_user, schools=schools)
+    
+
+@auth.route("/waiting-room")
+def waiting_room(username ="", password=""):
+    cur = db.connection.cursor()
+    cur.execute("SELECT * FROM app_user WHERE (username, userpassword) = (%s, %s)", (username, password))
+    user = cur.fetchone()
+    cur.close()
+    if user:
+        return render_template("waiting_room.html")
     else:
-        return render_template("sign_up.html", user=current_user, schools=schools)
+        return redirect(url_for("auth.login"))
 
 
 @login_manager.user_loader
