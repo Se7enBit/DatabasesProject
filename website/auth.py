@@ -21,7 +21,6 @@ auth = Blueprint("auth", __name__)
 
 """
 def get_user_role():
-    db = current_app.config["MYSQL_DB"]
     if "username" not in session:
         return render_template("login.html")
 
@@ -38,12 +37,13 @@ def get_user_role():
 """
 
 class User:
-    def __init__(self, user_id, username, password, is_active, is_authenticated=False):
+    def __init__(self, user_id, username, password, is_active, is_authenticated=False, is_anonymous=False):
         self.id = user_id
         self.username = username
         self.password = password
         self.is_active = is_active
         self.is_authenticated = is_authenticated
+        self.is_anonymous = is_anonymous
 
     def get_id(self):
         return self.id
@@ -67,12 +67,12 @@ class User:
         cur.close()
 
         if user:
-            authorized_user = User(
+            authenticated_user = User(
             user[0], user[7], user[8], user[6], True
         )
             #if check_password_hash(user[8], password):
             if (user[8]==password):
-                return authorized_user
+                return authenticated_user
         else:
             return None
 
@@ -87,14 +87,15 @@ def login():
         password = request.form["password"]
         user = User.authenticate(username, password)
 
+        if not user:
+            flash("Invalid username or password", category="error")
+            return render_template("login.html")
+        
         if not user.is_active:
             session["username"]=username
             session["password"]=password
             return redirect(url_for("auth.waiting_room"))
 
-        if not user:
-            flash("Invalid username or password", category="error")
-            return render_template("login.html", user=current_user)
         login_user(user, remember=True)
         return redirect(url_for("views.home"))
     return render_template("login.html")
@@ -103,6 +104,7 @@ def login():
 @auth.route("/logout")
 @login_required
 def logout():
+    session.clear()
     logout_user()
     return redirect(url_for("auth.login"))
 

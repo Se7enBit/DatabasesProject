@@ -9,4 +9,7 @@ views = Blueprint("views", __name__)
 @views.route("/", methods=["GET", "POST"])
 @login_required
 def home():
-    return render_template("home.html", user=current_user)
+    if current_user.is_anonymous:
+        return render_template("login.html")
+    else:
+        return render_template("home.html", user = current_user)
