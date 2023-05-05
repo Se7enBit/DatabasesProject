@@ -79,6 +79,7 @@ class User:
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
+    session.clear()
     if current_user.is_authenticated:
         return redirect(url_for("views.home"))
     if request.method == "POST":
@@ -87,7 +88,9 @@ def login():
         user = User.authenticate(username, password)
 
         if not user.is_active:
-            return redirect(url_for("auth.waiting_room", username=username, password=password))
+            session["username"]=username
+            session["password"]=password
+            return redirect(url_for("auth.waiting_room"))
 
         if not user:
             flash("Invalid username or password", category="error")
@@ -106,6 +109,7 @@ def logout():
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
+    session.clear()
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM school")
     schools = cur.fetchall()
@@ -146,22 +150,27 @@ def sign_up():
             db.connection.commit()
             cur.close()
 
-            user = User.authenticate(username, password1)
-            login_user(user, remember=True)
+
             flash("Account created.", category="success")
-            return redirect(url_for("auth.waiting_room", username=username, password=password1))
+            session["username"]=username
+            session["password"]=password1
+            return redirect(url_for("auth.waiting_room"))
   
     return render_template("sign_up.html", user=current_user, schools=schools)
     
 
 @auth.route("/waiting-room")
-def waiting_room(username ="", password=""):
-    cur = db.connection.cursor()
-    cur.execute("SELECT * FROM app_user WHERE (username, userpassword) = (%s, %s)", (username, password))
-    user = cur.fetchone()
-    cur.close()
+def waiting_room():
+    username = session.get("username")
+    password = session.get("password")
+    user = User.authenticate(username, password)
     if user:
-        return render_template("waiting_room.html")
+        if user.is_active:
+            login_user(user, remember=True)
+            return redirect(url_for("views.home"))
+        else:    
+            return render_template("waiting_room.html")
+            
     else:
         return redirect(url_for("auth.login"))
 
