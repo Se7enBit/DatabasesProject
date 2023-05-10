@@ -16,3 +16,24 @@ SELECT writer.*, COUNT(book_writer.book_id) AS NUM_books
        GROUP BY writer.id
        ORDER BY NUM_books DESC
        LIMIT 1;
+
+-- Select all books that a user has rented
+select book.*
+    from book
+    join book_rental
+    ON book.id = book_rental.book_id
+    where book_rental.app_user_id = 10
+    and book_rental.rental_status in ("rented", "late to return", "returned");
+
+-- Select all books in a specific category
+SELECT title FROM book WHERE FIND_IN_SET('drama', category);
+
+-- Select all books with similar titles to the prompt
+SELECT * FROM book WHERE title LIKE "%ΥΠΟΛΟΓΙΣΤΙΚΗ%";
+
+-- Select all users in possession of a book that is late to return
+SELECT app_user.first_name, app_user.last_name, book_rental.rental_datetime
+        FROM app_user
+        JOIN book_rental
+        ON book_rental.app_user_id = app_user.id
+        WHERE book_rental.rental_status = "late to return";
