@@ -21,7 +21,7 @@ first_name VARCHAR(40) NOT NULL,
 last_name VARCHAR(40) NOT NULL,
 birthdate DATE, # YYYY-MM-DD
 school INT,
-user_role ENUM('general_admin', 'school_admin', 'teacher', 'student') DEFAULT NULL,
+user_role ENUM('general_admin', 'school_admin', 'teacher', 'student') NOT NULL,
 is_active BOOLEAN DEFAULT 0,
 username VARCHAR(30) UNIQUE,
 userpassword VARCHAR(255),
@@ -67,7 +67,7 @@ CREATE TABLE book_copies_per_school(
 id INT AUTO_INCREMENT PRIMARY KEY,
 book_id INT NOT NULL,
 school_id INT NOT NULL,
-availability_status ENUM('available', 'engaged') DEFAULT 'available',
+availability BOOLEAN DEFAULT 1,
 FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE,
 FOREIGN KEY (school_id) REFERENCES school(id) ON DELETE CASCADE
 );
@@ -80,17 +80,30 @@ book_copy_id INT,
 request_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
 rental_datetime DATETIME,
 return_datetime DATETIME,
-#rental_datetime_deadline DATETIME,
-#return_datetime_deadline DATETIME,
-rental_status ENUM('rented', 'returned', 'late to return', 'on hold', 'cancelled') NOT NULL,
+cancel_datetime DATETIME,
+reservation_datetime DATETIME,
+rental_status ENUM('rented', 'returned', 'reservation', 'late to return', 'on hold', 'cancelled') NOT NULL,
 priority INT,
 late_to_return BOOLEAN DEFAULT 0,
 FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE,
 FOREIGN KEY (app_user_id) REFERENCES app_user(id) ON DELETE SET NULL,
 FOREIGN KEY (book_copy_id) REFERENCES book_copies_per_school(id) ON DELETE SET NULL,
-CONSTRAINT check_rental_datetime CHECK (rental_datetime >= request_datetime OR rental_datetime IS NULL),
-CONSTRAINT check_return_datetime CHECK ((return_datetime >= rental_datetime AND rental_datetime IS NOT NULL) OR return_datetime IS NULL),
-CONSTRAINT check_priority CHECK (priority >= 0)
+CONSTRAINT check_priority CHECK (priority >= 0),
+CONSTRAINT check_reservation_datetime CHECK ((reservation_datetime >= request_datetime AND reservation_datetime IS NOT NULL) OR reservation_datetime IS NULL),
+CONSTRAINT check_rental_datetime CHECK ((rental_datetime >= request_datetime AND
+										((rental_datetime > reservation_datetime AND reservation_datetime IS NOT NULL) OR reservation_datetime IS NULL) AND
+                                        cancel_datetime IS NULL AND
+                                        rental_datetime IS NOT NULL) OR rental_datetime IS NULL),
+CONSTRAINT check_return_datetime CHECK ((return_datetime > rental_datetime AND
+										 rental_datetime IS NOT NULL AND
+                                         cancel_datetime IS NULL AND
+                                         ((return_datetime > reservation_datetime AND reservation_datetime IS NOT NULL) OR reservation_datetime IS NULL) AND
+                                         return_datetime IS NOT NULL) OR return_datetime IS NULL),
+CONSTRAINT check_cancel_datetime CHECK ((cancel_datetime > request_datetime AND
+										 return_datetime IS NULL AND
+                                         rental_datetime IS NULL AND
+                                         ((cancel_datetime > reservation_datetime AND reservation_datetime IS NOT NULL) OR reservation_datetime IS NULL) AND
+                                         cancel_datetime IS NOT NULL) OR cancel_datetime IS NULL)
 );
 
 CREATE TABLE book_rating(
