@@ -1,6 +1,6 @@
 CREATE DATABASE school_library;
 USE school_library;
-SET NAMES 'utf8';
+ALTER DATABASE school_library CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 # Create the οbjects of the Database.
 CREATE TABLE school(
     id INT AUTO_INCREMENT PRIMARY KEY,
