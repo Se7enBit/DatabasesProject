@@ -48,3 +48,8 @@ def books():
         cur.close()
 
         return render_template("books.html", user = current_user, rows=rows, school = school)
+
+@views.route("/queries", methods=["GET", "POST"])
+@login_required
+def queries():
+    return render_template("queries.html", user=current_user)
