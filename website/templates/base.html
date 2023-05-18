@@ -49,6 +49,12 @@
           >
           <a
             class="nav-item nav-link"
+            id="books"
+            href="/books"
+            >Books</a
+          >
+          <a
+            class="nav-item nav-link"
             id="logout"
             href="/logout"
             >Logout</a
@@ -70,9 +76,15 @@
         </div>
       </div>
     </nav>
-
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %} {% if category ==
+    {% if current_user.is_authenticated %}
+    <div style="position: absolute; top: 10px; right: 10px; color: lightcyan">
+      <p>
+        Currently logged in as
+        <span style="color: aqua">{{user.username}}</span>
+      </p>
+    </div>
+    {% endif %} {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %} {% for category, message in messages %} {% if category ==
     'error' %}
     <div
       class="alert alert-danger alert-dismissible fade show"

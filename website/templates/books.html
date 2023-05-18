@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}Home{% endblock %} {% block content %}
+<h1 align="center">
+  List of books in
+  <span style="color: darkblue">{{school[0]}} Library</span>
+</h1>
+<br />
+<ul>
+  {% for row in rows %}
+  <li>
+    <div>
+      {% if row[2] %}
+      <img
+        src="data:image/jpeg;base64,{{ row[2] }}"
+        alt="{{ row[0] }}"
+        width="100"
+      />
+      {% else %}
+      <span>No Image Available</span>
+      {% endif %}
+    </div>
+    <div>
+      <h4>{{ row[0] }}</h4>
+      <p>Number of Copies: {{ row[1] }}</p>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
