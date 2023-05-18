@@ -9,15 +9,11 @@
   {% for row in rows %}
   <li>
     <div>
-      {% if row[2] %}
       <img
-        src="data:image/jpeg;base64,{{ row[2] }}"
+        src="src=data:image/png;base64, {{ row[2] }}"
         alt="{{ row[0] }}"
         width="100"
       />
-      {% else %}
-      <span>No Image Available</span>
-      {% endif %}
     </div>
     <div>
       <h4>{{ row[0] }}</h4>

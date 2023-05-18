@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
 from . import db
-import json, base64
+import json, base64, os
 
 views = Blueprint("views", __name__)
 
@@ -23,15 +23,19 @@ def books():
     else:
         user_id = current_user.get_id()
         cur = db.connection.cursor()
-        cur.execute("SELECT b.title, COUNT(bcps.id) AS copy_count, b.image FROM app_user AS au JOIN school AS s ON au.school = s.id JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id JOIN book AS b ON bcps.book_id = b.id WHERE au.id = %s GROUP BY b.title", [user_id])
+        cur.execute("SELECT b.title, COUNT(bcps.id) AS copy_count, b.image, b.id FROM app_user AS au JOIN school AS s ON au.school = s.id JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id JOIN book AS b ON bcps.book_id = b.id WHERE au.id = %s GROUP BY b.title", [user_id])
         rows = cur.fetchall()
         cur.close()
         
-        """
         modified_rows=[]
+        image_url=[]
+        ids=[]
         for row in rows:
+            ids.append(row[3]-1)
+        for index, row in enumerate(rows):
             row_list = list(row)
             image_blob = row_list[2]
+            print(image_blob)
             if image_blob:
                 # Convert the image BLOB to Base64 encoding
                 image_base64 = base64.b64encode(image_blob).decode('utf-8')
@@ -40,14 +44,16 @@ def books():
                 row_list[2] = None
             modified_row = tuple(row_list)
             modified_rows.append(modified_row)
-        """
+            image_url.append(url_for('static', filename=f'images/{ids[index]}.png'))
+        
+        
 
         cur = db.connection.cursor()
         cur.execute("SELECT s.appellation FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = %s", [user_id])
         school = cur.fetchone()
         cur.close()
 
-        return render_template("books.html", user = current_user, rows=rows, school = school)
+        return render_template("books.html", user = current_user, rows=modified_rows, image_url=image_url, school = school)
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
