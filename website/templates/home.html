@@ -1,3 +1,11 @@
-{% extends "base.html" %}{% block title %}Home{% endblock %} {% block content %}
+{% extends "base.html" %}{% block title %}Home{% endblock %}{% block navbar %}
+{% if role == 'school_admin' %}
+<a
+  class="nav-item nav-link"
+  id="school-admin"
+  href="/school-admin"
+  >School Admin</a
+>
+{% endif %} {% endblock %} {% block content %}
 <h1 align="center">Home Page</h1>
-{% if condition %} {% endif %} {% endblock %}
+{% endblock %}

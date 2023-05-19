@@ -1,5 +1,12 @@
-{% extends "base.html" %}{% block title %}Queries{% endblock %} {% block content
-%}
+{% extends "base.html" %}{% block title %}Queries{% endblock %} {% block navbar
+%} {% if role == 'school_admin' %}
+<a
+  class="nav-item nav-link"
+  id="school-admin"
+  href="/school-admin"
+  >School Admin</a
+>
+{% endif %} {% endblock %}{% block content %}
 <h1 align="center">Advanced Tools</h1>
 <div class="container">
   <form

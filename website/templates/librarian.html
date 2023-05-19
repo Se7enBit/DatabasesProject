@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% block title %}School Admin Page{% endblock %} {%
+block navbar %} {% if role == 'school_admin' %}
+<a
+  class="nav-item nav-link"
+  id="school-admin"
+  href="/school-admin"
+  >School Admin</a
+>
+{% endif %} {% endblock %} {% block content %}
+<h1 align="center">{{school}} Admin Page</h1>
+<div class="container">
+  <h6 style="text-align: left; text-decoration-line: underline">
+    Inactive Users
+  </h6>
+  <ul>
+    {% for user in users %}
+    <li>{{user[1]}} {{user[2]}} , role: {{user[5]}}</li>
+    {% endfor %}
+  </ul>
+</div>
+<div class="container">
+  <h6 style="text-align: left; text-decoration-line: underline">
+    Unpublished Ratings
+  </h6>
+  <ul>
+    {% for rating in ratings %}
+    <li>
+      <pre>
+For: {{rating[1]}} From: {{rating[2]}} Rating: {{rating[3]}}
+Comment: {{rating[4]}}
+      </pre>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

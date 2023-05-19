@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 {% block title %} {{name}} {% endblock %}
+{% block navbar %}
+{% if role == 'school_admin' %}
+<a
+  class="nav-item nav-link"
+  id="school-admin"
+  href="/school-admin"
+  >School Admin</a
+>  
+{% endif %}
+{% endblock %}
 
 {% block content %}
   <div class="container">

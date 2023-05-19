@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, url_for, session
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, session, redirect
 from flask_login import login_required, current_user
 from . import db
 import json, base64, os
@@ -15,12 +15,14 @@ def home():
     else:
         cur = db.connection.cursor()
         id=current_user.get_id()
-        cur.execute("SELECT school.id, school.appellation FROM app_user JOIN school ON app_user.school = school.id WHERE app_user.id = %s", (id,))
-        school = cur.fetchone()
+        cur.execute(f"SELECT s.id AS school_id, s.appellation AS school_appellation, au.user_role AS user_role FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = {id};")
+        info = cur.fetchone()
         cur.close()
-        session["school_name"]= school[1]
-        session["school_id"]= school[0]
-        return render_template("home.html", user = current_user)
+        session["school_id"]= info[0]
+        session["school_name"]= info[1]
+        session["user_role"]=info[2]
+
+        return render_template("home.html", user = current_user, role=session["user_role"])
     
 @views.route("/books", methods=["GET", "POST"])
 @login_required
@@ -57,7 +59,7 @@ def books():
 
         school_name=session["school_name"]
 
-        return render_template("books.html", user = current_user, rows=rows, image_url=image_url, school = school_name)
+        return render_template("books.html", user = current_user, rows=rows, image_url=image_url, school = school_name, role=session["user_role"])
 
 @views.route("/books/<book_id>", methods=["GET", "POST"])
 @login_required
@@ -104,10 +106,35 @@ def book_page(book_id):
                                name=book_info[1], publisher=book_info[2], isbn=book_info[3],
                                num_pages=book_info[4], categories=book_info[5], abstract=book_info[6],
                                language=book_info[7], image_url=image_url, keywords=book_info[9], writer=writer,
-                               available=available, rating=average_rating, comments=ratings, num_comments=len(ratings))
+                               available=available, rating=average_rating, comments=ratings, num_comments=len(ratings), role=session["user_role"])
 
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
 def queries():
-    return render_template("queries.html", user=current_user)
+    return render_template("queries.html", user=current_user, role=session["user_role"])
+
+@views.route("/school-admin", methods=["GET", "POST"])
+@login_required
+def school_admin():
+    role=session["user_role"]
+    if role != 'school_admin':
+        return redirect(url_for("views.home"))
+    else:
+        school=session["school_name"]
+        school_id=session["school_id"]
+        inactive_users = None
+        unpublished_ratings = None
+
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 1;")
+        inactive_users= cur.fetchall()
+        cur.close()
+
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 1 AND au.school = {school_id};")
+        unpublished_ratings= cur.fetchall()
+        cur.close()
+        print(unpublished_ratings)
+
+        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])

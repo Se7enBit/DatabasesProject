@@ -19,24 +19,7 @@ from . import login_manager, db
 
 auth = Blueprint("auth", __name__)
 
-"""
-def get_user_role():
-    if "username" not in session:
-        return render_template("login.html")
-
-    username = session["username"]
-
-    cur = db.connection.cursor()
-    cur.execute("SELECT role FROM users WHERE username=%s", [username])
-    user_role = cur.fetchone()
-
-    if user_role not in ["student", "teacher", "librarian", "admin"]:
-        return render_template("login.html")
-
-    return user_role
-"""
-
-class User:
+class User():
     def __init__(self, user_id, username, password, is_active, is_authenticated=False, is_anonymous=False):
         self.id = user_id
         self.username = username
@@ -75,7 +58,6 @@ class User:
                 return authenticated_user
         else:
             return None
-
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():

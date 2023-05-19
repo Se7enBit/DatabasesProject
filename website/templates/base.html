@@ -26,6 +26,8 @@
     <title>{% block title %}School Library{% endblock %}</title>
   </head>
   <body>
+    
+    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <button
         class="navbar-toggler"
@@ -53,6 +55,8 @@
             href="/books"
             >Books</a
           >
+          {% block navbar %}
+          {% endblock %}
           <a
             class="nav-item nav-link"
             id="queries"
