@@ -21,16 +21,16 @@
             style="margin:20px;"
             width="250">
         <div class="book-details">
-          <h2 class="product-title">Πληροφορίες</h2>
-          <p class="book-description"><b>Εκδότης:</b> {{publisher}}</p>
+          <h2 class="product-title">Information</h2>
+          <p class="book-description"><b>Publisher:</b> {{publisher}}</p>
           <p class="book-description"><b>ISBN:</b> {{isbn}}</p>
-          <p class="book-description"><b>Σελίδες:</b> {{num_pages}}</p>
-          <p class="book-description"><b>Γλώσσα:</b> {{language}}</p>
-          <p class="book-description"><b>Κατηγορίες:</b> {{categories}}</p>
-          <p class="book-description"><b>Λέξεις-κλειδιά:</b> {{keywords}}</p>
-          <p class="book-description"></br><b>Περιγραφή:</b></br>{{abstract}}</p>
-          <p class="book-description"><b></br>Διαθέσιμα:</b> {{available[1]}}/{{available[0]}}</p>
-          <button class="product-button">Add to Cart</button>
+          <p class="book-description"><b>Pages:</b> {{num_pages}}</p>
+          <p class="book-description"><b>Language:</b> {{language}}</p>
+          <p class="book-description"><b>Categories:</b> {{categories}}</p>
+          <p class="book-description"><b>Keywors:</b> {{keywords}}</p>
+          <p class="book-description"></br><b>Abstract:</b></br>{{abstract}}</p>
+          <p class="book-description"><b></br>Available:</b> {{available[1]}}/{{available[0]}}</p>
+          <button class="button">Order</button>
         </div>
     </div>
     
@@ -45,28 +45,31 @@
         </div>
         {% endfor %}
         {% else %}
-        <p class="comment">Wow, there are no ratings... Why not break the ice by making your own?</p>
+        <p class="comment">Wow, there are no comments... Why not break the ice by making your own?</p>
         {% endif %}
       </div>
     </div>
 
-    <!-- <div class="sidebar">
-      <div class="order-form">
-        <h3>Order Form</h3>
-        <div class="form-input">
-          <label for="name">Name:</label>
-          <input type="text" id="name" name="name" placeholder="Enter your name">
+    <form action="/" method="post">
+    <div class="make-comment">
+        <div class="form-input" style="width:60px">
+          <select>
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option value=4>4</option>
+            <option value=5>5</option>
+          </select>
         </div>
-        <div class="form-input">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email">
+        <div class="form-input" style="width:70%">
+          <input type="text" id="comment" name="comment" placeholder="Write your opinion...">
         </div>
-        <div class="form-input">
-          <label for="quantity">Quantity:</label>
-          <input type="number" id="quantity" name="quantity" min="1" value="1">
+        <div style="margin-left:4px">
+            <button class="button">Submit Rating</button>
         </div>
-        <button class="product-button">Place Order</button>
-      </div>
     </div>
-  </div> -->
+    </form>
+
+  </div>
+  <br>
 {% endblock %}
