@@ -64,6 +64,11 @@ def books():
 
         return render_template("books.html", user = current_user, rows=rows, image_url=image_url, school = school_name)
 
+@views.route("/books/<book_name>", methods=["GET", "POST"])
+@login_required
+def book_page(book_name):
+    return f"This is the page of {book_name}"
+
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
 def queries():
