@@ -1,6 +1,61 @@
 {% extends "base.html" %}
-{% block title %} {{book_name}} {% endblock %}
+{% block title %} {{name}} {% endblock %}
 
 {% block content %}
-<p>This is the page of book {{book_id}}</p>
+  <div class="container">
+      <h1 style="padding-top:10px">{{name}}</h1>
+      <h3 style="color: #888">{{writer}}</h3>
+      <div class="product">
+        <img src="{{image_url}}"
+            alt="Book Cover"
+            style="margin:20px;"
+            width="250">
+        <div class="book-details">
+          <h2 class="product-title">Πληροφορίες</h2>
+          <p class="book-description"><b>Εκδότης:</b> {{publisher}}</p>
+          <p class="book-description"><b>ISBN:</b> {{isbn}}</p>
+          <p class="book-description"><b>Σελίδες:</b> {{num_pages}}</p>
+          <p class="book-description"><b>Γλώσσα:</b> {{language}}</p>
+          <p class="book-description"><b>Κατηγορίες:</b> {{categories}}</p>
+          <p class="book-description"><b>Λέξεις-κλειδιά:</b> {{keywords}}</p>
+          <p class="book-description"></br><b>Περιγραφή:</b></br>{{abstract}}</p>
+          <p class="book-description"><b></br>Διαθέσιμα:</b> {{available[1]}}/{{available[0]}}</p>
+          <button class="product-button">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="comment-section">
+        <h3>Σχόλια</h3>
+        <div class="comment">
+          <div class="comment-author">John Doe</div>
+          <div class="comment-date">May 1, 2023</div>
+          <div class="comment-text">Great product! Highly recommended.</div>
+        </div>
+        <div class="comment">
+          <div class="comment-author">Jane Smith</div>
+          <div class="comment-date">May 2, 2023</div>
+          <div class="comment-text">I had a question about this product and the customer support team was very helpful.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="sidebar">
+      <div class="order-form">
+        <h3>Order Form</h3>
+        <div class="form-input">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" placeholder="Enter your name">
+        </div>
+        <div class="form-input">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email">
+        </div>
+        <div class="form-input">
+          <label for="quantity">Quantity:</label>
+          <input type="number" id="quantity" name="quantity" min="1" value="1">
+        </div>
+        <button class="product-button">Place Order</button>
+      </div>
+    </div>
+  </div> -->
 {% endblock %}

@@ -66,14 +66,37 @@ def book_page(book_id):
         return render_template("login.html")
     else:
         user_id = current_user.get_id()
+        school_id = session["school_id"]
 
         #Get all info about book
         cur = db.connection.cursor()
         cur.execute(f"SELECT * FROM book WHERE book.id = {book_id}")
         book_info = cur.fetchone()
         cur.close()
+        im_number = str(int(book_id)-1)
+        image_url = url_for("static", filename=f"images/{im_number}.png")
 
-        return render_template("book_page.html", user=current_user, book_id=book_id, book_name=book_info[1])
+        #Get book writer
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT first_name, last_name FROM writer JOIN book_writer ON writer.id=book_writer.writer_id WHERE book_writer.book_id={book_id}")
+        writer_full = cur.fetchone()
+        cur.close()
+        writer = writer_full[0]+" "+writer_full[1]
+
+        #Get copies and available copies
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT COUNT(bcps.id) FROM book_copies_per_school AS bcps WHERE bcps.school_id={school_id} AND bcps.book_id={book_id};")
+        available=[cur.fetchone()[0]]
+        cur.execute(f"SELECT COUNT(*) FROM book_copies_per_school AS bcps WHERE bcps.school_id={school_id} AND bcps.book_id={book_id} AND bcps.availability=1;")
+        available.append(cur.fetchone()[0])
+        cur.close()
+
+        return render_template("book_page.html", user=current_user, book_id=book_info[0],
+                               name=book_info[1], publisher=book_info[2], isbn=book_info[3],
+                               num_pages=book_info[4], categories=book_info[5], abstract=book_info[6],
+                               language=book_info[7], image_url=image_url, keywords=book_info[9], writer=writer,
+                               available=available)
+
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required

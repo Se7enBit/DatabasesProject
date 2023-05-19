@@ -19,3 +19,98 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* .main-content {
+  flex: 1;
+} */
+/* h1 {
+  color: #333;
+} */
+.product {
+  display: flex;
+  align-items: center;
+  background-color: #d6dee6;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 15px;
+}
+/* .product-image {
+  flex: 0 0 200px;
+  margin-right: 20px;
+} */
+.product-image img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+.book-details {
+  flex: 1;
+  /* background-color: #888; */
+}
+.product-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+/* .product-price {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 10px;
+} */
+.book-description {
+  margin-bottom: 8px;
+}
+.product-button {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+.comment-section {
+  margin-top: 30px;
+}
+.comment {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+.comment-author {
+  font-weight: bold;
+  color: #333;
+}
+.comment-date {
+  font-size: 12px;
+  color: #888;
+}
+.comment-text {
+  margin-top: 5px;
+}
+.sidebar {
+  width: 300px;
+  margin-left: 20px;
+}
+.order-form {
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+.form-input {
+  margin-bottom: 10px;
+}
+.form-input label {
+  font-weight: bold;
+  display: block;
+}
+.form-input input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.form-input button {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
