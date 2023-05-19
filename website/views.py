@@ -34,31 +34,26 @@ def books():
         rows = cur.fetchall()
         cur.close()
         
-        #modified_rows=[]
+        modified_rows=[]
         image_url=[]
         ids=[]
                    
         for index, row in enumerate(rows):
             ids.append(row[3]-1)
-            #row_list = list(row)
-            #image_blob = row_list[2]
-            #if image_blob:
+            """
+            row_list = list(row)
+            image_blob = row_list[2]
+            if image_blob:
             # Convert the image BLOB to Base64 encoding
-            #    image_base64 = base64.b64encode(image_blob).decode('utf-8')
-            #    row_list[2] = image_base64
-            #else:
-            #    row_list[2] = None
-            #modified_row = tuple(row_list)
-            #modified_rows.append(modified_row)
+                image_base64 = base64.b64encode(image_blob).decode('utf-8')
+                row_list[2] = image_base64
+            else:
+                row_list[2] = None
+            modified_row = tuple(row_list)
+            modified_rows.append(modified_row)
+            """
+            
             image_url.append(url_for('static', filename=f'images/{ids[index]}.png'))
-
-        #query to get school name but we already did this when rednering home.html, and school_name and id is stored in session
-        """
-        cur = db.connection.cursor()
-        cur.execute("SELECT s.appellation FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = %s", [user_id])
-        school = cur.fetchone()
-        cur.close()
-        """
 
         school_name=session["school_name"]
 
@@ -76,7 +71,6 @@ def book_page(book_id):
         cur = db.connection.cursor()
         cur.execute(f"SELECT * FROM book WHERE book.id = {book_id}")
         book_info = cur.fetchone()
-        print(book_info)
         cur.close()
 
         return render_template("book_page.html", user=current_user, book_id=book_id, book_name=book_info[1])

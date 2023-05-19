@@ -19,3 +19,11 @@ get books per school:
 SELECT book_copies_per_school.\*
 FROM book_copies_per_school
 WHERE book_copies_per_school.school_id = "school_id(placeholder)";
+
+query to get school name from user_id
+"""
+cur = db.connection.cursor()
+cur.execute("SELECT s.appellation FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = %s", [user_id])
+school = cur.fetchone()
+cur.close()
+"""
