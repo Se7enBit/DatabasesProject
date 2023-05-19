@@ -97,6 +97,7 @@ CREATE TABLE book(
         -- CONSTRAINT check_keywords CHECK (keywords REGEXP '^([a-zA-Z]+)(, ?[a-zA-Z]+)*$'),
         CONSTRAINT check_number_of_pages CHECK (number_of_pages > 0)
 );
+ALTER TABLE book CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE writer(
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(40) NOT NULL,
