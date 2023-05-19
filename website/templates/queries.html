@@ -1,4 +1,22 @@
 {% extends "base.html" %}{% block title %}Queries{% endblock %} {% block content
 %}
-<h1 align="center">Queries</h1>
+<h1 align="center">Advanced Tools</h1>
+<form
+  action="/run-query"
+  method="post"
+>
+  <button
+    type="submit"
+    name="query1.1"
+  >
+    Rents per School
+  </button>
+</form>
+
+<ul>
+  {% if query1_1 %} {% for query in query1_1 %}
+  <li>{{query[0]}} | {{query [1]}}</li>
+  {% endfor %} {% endif %}
+</ul>
+
 {% endblock %}

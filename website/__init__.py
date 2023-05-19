@@ -25,6 +25,8 @@ login_manager.login_view = "auth.login"
 
 from .views import views
 from .auth import auth
+from .queries import queries
 
 app.register_blueprint(views, url_prefix="/")
 app.register_blueprint(auth, url_prefix="/")
+app.register_blueprint(queries, url_prefix="/")
