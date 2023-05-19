@@ -6,8 +6,8 @@
       <h1 style="padding-top:10px">{{name}}</h1>
       <h3 style="color: #888">{{writer}}</h3>
       <div class="product">
-        <img src="{{image_url}}"
-            alt="Book Cover"
+          <img src="{{image_url}}"
+          alt="Book Cover"
             style="margin:20px;"
             width="250">
         <div class="book-details">
@@ -22,20 +22,21 @@
           <p class="book-description"><b></br>Διαθέσιμα:</b> {{available[1]}}/{{available[0]}}</p>
           <button class="product-button">Add to Cart</button>
         </div>
-      </div>
-
-      <div class="comment-section">
-        <h3>Σχόλια</h3>
+    </div>
+    
+    <div class="comment-section">
+        <h3>Comments (★{{rating}}/5)</h3>
+        {% if num_comments > 0: %}
+        {% for comment in comments %}
         <div class="comment">
-          <div class="comment-author">John Doe</div>
-          <div class="comment-date">May 1, 2023</div>
-          <div class="comment-text">Great product! Highly recommended.</div>
+          <div class="comment-author">{{comment[0]}} ({{comment[1]}}★)</div>
+          <div class="comment-date">{{comment[3]}}</div>
+          <div class="comment-text">{{comment[2]}}</div>
         </div>
-        <div class="comment">
-          <div class="comment-author">Jane Smith</div>
-          <div class="comment-date">May 2, 2023</div>
-          <div class="comment-text">I had a question about this product and the customer support team was very helpful.</div>
-        </div>
+        {% endfor %}
+        {% else %}
+        <p class="comment">Wow, there are no ratings... Why not break the ice by making your own?</p>
+        {% endif %}
       </div>
     </div>
 

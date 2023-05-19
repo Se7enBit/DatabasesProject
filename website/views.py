@@ -91,11 +91,20 @@ def book_page(book_id):
         available.append(cur.fetchone()[0])
         cur.close()
 
+        #Get book ratings
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT username, rating, comments, rating_datetime FROM book_rating JOIN app_user ON app_user.id=book_rating.app_user_id WHERE book_id={book_id} AND is_published=1")
+        ratings = cur.fetchall()
+        cur.close()
+        average_rating=0
+        for row in ratings: average_rating += int(row[1])
+        if len(ratings)!=0: average_rating/=len(ratings)
+
         return render_template("book_page.html", user=current_user, book_id=book_info[0],
                                name=book_info[1], publisher=book_info[2], isbn=book_info[3],
                                num_pages=book_info[4], categories=book_info[5], abstract=book_info[6],
                                language=book_info[7], image_url=image_url, keywords=book_info[9], writer=writer,
-                               available=available)
+                               available=available, rating=average_rating, comments=ratings, num_comments=len(ratings))
 
 
 @views.route("/queries", methods=["GET", "POST"])
