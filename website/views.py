@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, url_for
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, session
 from flask_login import login_required, current_user
 from . import db
 import json, base64, os
@@ -13,6 +13,13 @@ def home():
     if current_user.is_anonymous:
         return render_template("login.html")
     else:
+        cur = db.connection.cursor()
+        id=current_user.get_id()
+        cur.execute("SELECT school.id, school.appellation FROM app_user JOIN school ON app_user.school = school.id WHERE app_user.id = %s", (id,))
+        school = cur.fetchone()
+        cur.close()
+        session["school_name"]= school[1]
+        session["school_id"]= school[0]
         return render_template("home.html", user = current_user)
     
 @views.route("/books", methods=["GET", "POST"])
@@ -27,33 +34,35 @@ def books():
         rows = cur.fetchall()
         cur.close()
         
-        modified_rows=[]
+        #modified_rows=[]
         image_url=[]
         ids=[]
-        for row in rows:
-            ids.append(row[3]-1)
+                   
         for index, row in enumerate(rows):
-            row_list = list(row)
-            image_blob = row_list[2]
-            print(image_blob)
-            if image_blob:
-                # Convert the image BLOB to Base64 encoding
-                image_base64 = base64.b64encode(image_blob).decode('utf-8')
-                row_list[2] = image_base64
-            else:
-                row_list[2] = None
-            modified_row = tuple(row_list)
-            modified_rows.append(modified_row)
+            ids.append(row[3]-1)
+            #row_list = list(row)
+            #image_blob = row_list[2]
+            #if image_blob:
+            # Convert the image BLOB to Base64 encoding
+            #    image_base64 = base64.b64encode(image_blob).decode('utf-8')
+            #    row_list[2] = image_base64
+            #else:
+            #    row_list[2] = None
+            #modified_row = tuple(row_list)
+            #modified_rows.append(modified_row)
             image_url.append(url_for('static', filename=f'images/{ids[index]}.png'))
-        
-        
 
+        #query to get school name but we already did this when rednering home.html, and school_name and id is stored in session
+        """
         cur = db.connection.cursor()
         cur.execute("SELECT s.appellation FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = %s", [user_id])
         school = cur.fetchone()
         cur.close()
+        """
 
-        return render_template("books.html", user = current_user, rows=modified_rows, image_url=image_url, school = school)
+        school_name=session["school_name"]
+
+        return render_template("books.html", user = current_user, rows=rows, image_url=image_url, school = school_name)
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required

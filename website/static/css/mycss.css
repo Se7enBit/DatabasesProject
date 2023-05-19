@@ -1,3 +1,21 @@
 .navbar-right {
   margin-left: auto;
 }
+
+.logout-link::before {
+  content: "\F1C3";
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: "Glyphicons Halflings";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
