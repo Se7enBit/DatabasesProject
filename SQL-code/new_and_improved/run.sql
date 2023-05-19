@@ -7,5 +7,5 @@ source ./Database/data_insertions.sql;
 source ./Database/book_copies_insertions.sql;
 source ./Database/book_rental_insertions.sql;
 source ./Database/rating_insertions.sql;
-\! python3 ../scrapper/scripts/image_update.py
+\! ../scrapper/scripts/image_update.py
 source ./Database/image_update.sql;
