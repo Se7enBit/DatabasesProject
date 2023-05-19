@@ -91,7 +91,7 @@ CREATE TABLE book(
         # You can list up to 64 values in a SET list. THE ORDER OF THE VALUES IS OF GREAT IMPORTANCE.
         abstract TEXT,
         lang ENUM('Greek', 'English', 'French', 'German') DEFAULT 'Greek',
-        image BLOB,
+        image LONGBLOB,
         keywords TEXT,
         -- CONSTRAINT check_isbn CHECK (isbn REGEXP '^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$'), # ΘΕΛΕΙ ΚΑΙ CHECKSUM VALIDATION ΑΠΟ ΤΗΝ PYTHON.
         -- CONSTRAINT check_keywords CHECK (keywords REGEXP '^([a-zA-Z]+)(, ?[a-zA-Z]+)*$'),
