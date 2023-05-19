@@ -1,22 +1,95 @@
 {% extends "base.html" %}{% block title %}Queries{% endblock %} {% block content
 %}
 <h1 align="center">Advanced Tools</h1>
-<form
-  action="/run-query"
-  method="post"
->
-  <button
-    type="submit"
-    name="query1.1"
+<div class="container">
+  <form
+    action="/run-query"
+    method="post"
   >
-    Rents per School
-  </button>
-</form>
+    <div class="form-group">
+      <button
+        type="submit"
+        name="query1.1"
+        class="btn btn-primary"
+      >
+        Rents per School
+      </button>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="yearCheckbox"
+            onchange="toggleInputs()"
+          />
+          Select Year
+        </label>
 
-<ul>
-  {% if query1_1 %} {% for query in query1_1 %}
-  <li>{{query[0]}} | {{query [1]}}</li>
-  {% endfor %} {% endif %}
-</ul>
+        <label>
+          <input
+            type="checkbox"
+            name="monthCheckbox"
+            onchange="toggleInputs()"
+          />
+          Select Month
+        </label>
+
+        <div
+          id="yearInput"
+          style="display: none"
+        >
+          <label for="year">
+            Year:
+            <input
+              id="year"
+              type="number"
+              name="year"
+              min="1950"
+              max="2025"
+            />
+          </label>
+        </div>
+
+        <div
+          id="monthInput"
+          style="display: none"
+        >
+          <label for="month">
+            Month:
+            <input
+              id="month"
+              type="month"
+              name="month"
+            />
+          </label>
+        </div>
+      </div>
+
+      <ul>
+        {% if query1_1 %} {% for query in query1_1 %}
+        <li>{{query[0]}} | {{query [1]}}</li>
+        {% endfor %} {% endif %}
+      </ul>
+    </div>
+  </form>
+  <form
+    action="/run-query"
+    method="post"
+  >
+    <div class="form-group">
+      <button
+        type="submit"
+        name="query1.2"
+        class="btn btn-primary"
+      >
+        List of registered schools
+      </button>
+      <ul>
+        {% if query1_2 %} {% for query in query1_2 %}
+        <li>{{query[0]}} | {{query [1]}}</li>
+        {% endfor %} {% endif %}
+      </ul>
+    </div>
+  </form>
+</div>
 
 {% endblock %}
