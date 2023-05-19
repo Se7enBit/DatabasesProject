@@ -64,10 +64,22 @@ def books():
 
         return render_template("books.html", user = current_user, rows=rows, image_url=image_url, school = school_name)
 
-@views.route("/books/<book_name>", methods=["GET", "POST"])
+@views.route("/books/<book_id>", methods=["GET", "POST"])
 @login_required
-def book_page(book_name):
-    return f"This is the page of {book_name}"
+def book_page(book_id):
+    if current_user.is_anonymous:
+        return render_template("login.html")
+    else:
+        user_id = current_user.get_id()
+
+        #Get all info about book
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT * FROM book WHERE book.id = {book_id}")
+        book_info = cur.fetchone()
+        print(book_info)
+        cur.close()
+
+        return render_template("book_page.html", user=current_user, book_id=book_id, book_name=book_info[1])
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
