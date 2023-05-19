@@ -9,3 +9,4 @@ source ./Database/book_rental_insertions.sql;
 source ./Database/rating_insertions.sql;
 \! ../scrapper/scripts/image_update.py
 source ./Database/image_update.sql;
+source ./Database/password_update.sql;
