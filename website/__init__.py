@@ -16,6 +16,7 @@ app.config["MYSQL_USER"] = "root"
 #app.config["MYSQL_PASSWORD"] = ""
 app.config["MYSQL_HOST"] = "localhost"
 app.config['MYSQL_CHARSET'] = 'utf8mb4'
+app.config['SQLALCHEMY_ECHO'] = True #Uncomment to see querry outputs
 
 db = MySQL(app)
 

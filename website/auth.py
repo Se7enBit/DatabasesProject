@@ -118,7 +118,7 @@ def sign_up():
         if app_user:
             flash("Username already exists.", category="error")
         if len(username) < 4:
-            flash("Username must be greater than 3 character.", category="error")
+            flash("Username must be greater than 3 characters.", category="error")
         elif password1 != password2:
             flash("Passwords don't match.", category="error")
         elif len(password1) < 7:

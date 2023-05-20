@@ -95,12 +95,25 @@ def book_page(book_id):
 
         #Get book ratings
         cur = db.connection.cursor()
-        cur.execute(f"SELECT username, rating, comments, rating_datetime FROM book_rating JOIN app_user ON app_user.id=book_rating.app_user_id WHERE book_id={book_id} AND is_published=1")
+        cur.execute(f"SELECT username, rating, comments, rating_datetime, app_user.id FROM book_rating JOIN app_user ON app_user.id=book_rating.app_user_id WHERE book_id={book_id} AND is_published=1")
         ratings = cur.fetchall()
         cur.close()
         average_rating=0
         for row in ratings: average_rating += int(row[1])
         if len(ratings)!=0: average_rating/=len(ratings)
+
+        #This loads when you post a comment:
+        if request.method=="POST" and "comment" in request.form and "rating" in request.form:
+            if any(row[4]==user_id for row in ratings):
+                flash("You have already posted a rating for this book", category='error')
+            else:
+                rating = request.form.get("rating")
+                comment = request.form.get("comment")
+                cur = db.connection.cursor()
+                print(f"""Running querry: INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
+                cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
+                cur.close()
+                flash("Your rating has been posted successfuly!", category='info')
 
         return render_template("book_page.html", user=current_user, book_id=book_info[0],
                                name=book_info[1], publisher=book_info[2], isbn=book_info[3],

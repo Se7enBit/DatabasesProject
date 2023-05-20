@@ -50,15 +50,15 @@
       </div>
     </div>
 
-    <form action="/" method="post">
+    <form action="./{{book_id}}" method="post">
     <div class="make-comment">
         <div class="form-input" style="width:60px">
-          <select>
-            <option value=1>1</option>
-            <option value=2>2</option>
-            <option value=3>3</option>
-            <option value=4>4</option>
-            <option value=5>5</option>
+          <select id="rating" name="rating">
+            <option value=1>1★</option>
+            <option value=2>2★</option>
+            <option value=3>3★</option>
+            <option value=4>4★</option>
+            <option value=5>5★</option>
           </select>
         </div>
         <div class="form-input" style="width:70%">
