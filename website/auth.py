@@ -77,7 +77,7 @@ def login():
             session["username"]=username
             session["password"]=password
             return redirect(url_for("auth.waiting_room"))
-
+        session["username"]=username
         login_user(user, remember=True)
         return redirect(url_for("views.home"))
     return render_template("login.html")

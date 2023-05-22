@@ -10,3 +10,4 @@ source ./Database/rating_insertions.sql;
 \! python ../scrapper/scripts/image_update.py
 source ./Database/image_update.sql;
 source ./Database/password_update.sql;
+source ./Database/on_delete_triggers.sql;

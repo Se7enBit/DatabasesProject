@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, url_for, session, redirect
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, session, redirect, send_file
 from flask_login import login_required, current_user
 from . import db
 import json, base64, os
@@ -151,3 +151,41 @@ def school_admin():
         print(unpublished_ratings)
 
         return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
+    
+@views.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    if request.method == "POST":
+        new_username = request.form.get("username")
+        new_bdate= request.form.get("birthdate")
+        
+        cur = db.connection.cursor()
+        cur.execute("SELECT username FROM app_user;")
+        result=cur.fetchall()
+        cur.close()
+        users=list(result)
+
+        if len(new_username) < 4:
+            flash("Username must be greater than 3 character.", category="error")
+        elif new_username in users:
+            flash("Username already exists.", category="error")
+        else:
+            user =  session["username"]
+            cur = db.connection.cursor()
+            cur.execute("UPDATE app_user SET birthdate = %s, username= %s WHERE username= %s;", (new_bdate, new_username, user))
+            db.connection.commit()
+            cur.close()
+
+            session["username"]= new_username
+            flash("Info updated succesfully.", category="success")
+        return redirect(url_for('views.home'))
+    else:
+        cur = db.connection.cursor()
+        cur.execute("SELECT * FROM app_user WHERE username = %s;", (current_user.username,))
+        result= cur.fetchone()
+        cur.close()
+        info = []
+        info.append(result[1])
+        info.append(result[2])
+        info.append(result[3])
+        return render_template("profile.html", user=current_user, school=session["school_name"], info=info, role=session["user_role"])

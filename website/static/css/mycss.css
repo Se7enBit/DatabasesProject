@@ -1,5 +1,6 @@
 .navbar-right {
-  margin-left: auto;
+  float: right!important;
+  margin-right: -15px;
 }
 
 .logout-link::before {
