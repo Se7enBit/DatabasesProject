@@ -13,6 +13,8 @@
 <div class="product">
   <div class="book-details">
     <h2 class="product-title">Information</h2>
+    <p class="book-description"><b>First Name:</b> {{info[0]}}</p>
+    <p class="book-description"><b>Last Name:</b> {{info[1]}}</p>
     <p class="book-description"><b>School:</b> {{school}}</p>
     <p class="book-description"><b>Username:</b> {{user.username}}</p>
     <p class="book-description"><b>Birthdate:</b> {{info[2]}}</p>
@@ -21,29 +23,71 @@
   {% if role == 'teacher' %}
   <div class="modify-info">
     <h3 class="modify-title">Modify Information</h3>
-    <form method="POST">
+    <form
+      method="POST"
+      action="/profile"
+    >
+      <div class="form-group">
+        <label for="name">First Name:</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+        /><br />
+        <label for="last-name">Last Name:</label>
+        <input
+          type="text"
+          id="lastname"
+          name="lastname"
+        /><br />
+        <button
+          type="submit"
+          name="name"
+          class="btn btn-primary"
+        >
+          Change Name
+        </button>
+      </div>
+    </form>
+    <form
+      method="POST"
+      action="/profile"
+    >
       <div class="form-group">
         <label for="username">Username:</label>
         <input
           type="text"
           id="username"
           name="username"
-        /><br /><br />
+        /><br />
+        <button
+          type="submit"
+          name="username"
+          class="btn btn-primary"
+        >
+          Change username
+        </button>
       </div>
+    </form>
+    <form
+      method="POST"
+      action="/profile"
+    >
       <div class="form-group">
         <label for="birthdate">Birthdate:</label>
         <input
           type="date"
           id="birthdate"
           name="birthdate"
-        /><br /><br />
+        /><br />
+        <button
+          type="submit"
+          name="birthdate"
+          class="btn btn-primary"
+        >
+          Change Birthdate
+        </button>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary"
-      >
-        Submit
-      </button>
     </form>
   </div>
   {% endif %}

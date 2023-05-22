@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, jsonify, url_for, 
 from flask_login import login_required, current_user
 from . import db
 import json, base64, os
+from datetime import datetime, date
 
 views = Blueprint("views", __name__)
 
@@ -157,28 +158,57 @@ def school_admin():
 @login_required
 def profile():
     if request.method == "POST":
-        new_username = request.form.get("username")
-        new_bdate= request.form.get("birthdate")
+        user =  session["username"]
+
+        if "name" in request.form:
+            new_name = request.form.get("name")
+            new_lastname = request.form.get("lastname")
+            if new_name and new_lastname:
+                cur = db.connection.cursor()
+                cur.execute("UPDATE app_user SET first_name= %s, last_name= %s WHERE username= %s;", (new_name, new_lastname, user))
+                db.connection.commit()
+                cur.close()
+            else:
+                flash("Try Again.", category="error")
+                return redirect(url_for('views.profile'))  
+
+        if "birthdate" in request.form:
+            new_bdate= request.form.get("birthdate")
+            date_object = datetime.strptime(new_bdate, "%Y-%m-%d")
+            current_year = date.today().year
+
+            if current_year - date_object.year < 18:
+                flash("Dear teacher, you cant be less than 18 years old.", category="error")
+                return redirect(url_for('views.profile'))
+            else:  
+                cur = db.connection.cursor()
+                cur.execute("UPDATE app_user SET birthdate= %s WHERE username= %s;", (new_bdate, user))
+                db.connection.commit()
+                cur.close()
         
-        cur = db.connection.cursor()
-        cur.execute("SELECT username FROM app_user;")
-        result=cur.fetchall()
-        cur.close()
-        users=list(result)
-
-        if len(new_username) < 4:
-            flash("Username must be greater than 3 character.", category="error")
-        elif new_username in users:
-            flash("Username already exists.", category="error")
-        else:
-            user =  session["username"]
+        if "username" in request.form:
+            new_username = request.form.get("username")
             cur = db.connection.cursor()
-            cur.execute("UPDATE app_user SET birthdate = %s, username= %s WHERE username= %s;", (new_bdate, new_username, user))
-            db.connection.commit()
+            cur.execute("SELECT username FROM app_user;")
+            result=cur.fetchall()
             cur.close()
+            users=list(result)
 
-            session["username"]= new_username
-            flash("Info updated succesfully.", category="success")
+            if len(new_username) < 4:
+                flash("Username must be greater than 3 character.", category="error")
+                return redirect(url_for('views.profile'))
+            elif new_username in users:
+                flash("Username already exists.", category="error")
+                return redirect(url_for('views.profile'))
+            else:
+                cur = db.connection.cursor()
+                cur.execute("UPDATE app_user SET username= %s WHERE username= %s;", (new_username, user))
+                db.connection.commit()
+                cur.close()
+
+                session["username"]= new_username
+        
+        flash("Info updated succesfully.", category="success")
         return redirect(url_for('views.home'))
     else:
         cur = db.connection.cursor()
