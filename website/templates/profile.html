@@ -1,0 +1,51 @@
+{% extends "base2.html" %}{% block title %}Profile{% endblock %}{% block navbar
+%} {% if role == 'school_admin' %}
+<a
+  class="nav-link"
+  id="school-admin"
+  href="/school-admin"
+  >School Admin</a
+>
+{% endif %} {% endblock %} {% block content %}
+<h1 style="padding-top: 10px; color: #2b2020">
+  {{info[0]}} {{info[1]}}'s Profile
+</h1>
+<div class="product">
+  <div class="book-details">
+    <h2 class="product-title">Information</h2>
+    <p class="book-description"><b>School:</b> {{school}}</p>
+    <p class="book-description"><b>Username:</b> {{user.username}}</p>
+    <p class="book-description"><b>Birthdate:</b> {{info[2]}}</p>
+    <p class="book-description"><b>Role:</b> {{role}}</p>
+  </div>
+  {% if role == 'teacher' %}
+  <div class="modify-info">
+    <h3 class="modify-title">Modify Information</h3>
+    <form method="POST">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+        /><br /><br />
+      </div>
+      <div class="form-group">
+        <label for="birthdate">Birthdate:</label>
+        <input
+          type="date"
+          id="birthdate"
+          name="birthdate"
+        /><br /><br />
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary"
+      >
+        Submit
+      </button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

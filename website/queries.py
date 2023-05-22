@@ -57,4 +57,4 @@ def run_query():
       query2= cur.fetchall()
       cur.close()
 
-    return render_template("queries.html", query1_1=query1, query1_2=query2, user=current_user)
+    return render_template("queries.html", query1_1=query1, query1_2=query2, user=current_user, role=session["user_role"])

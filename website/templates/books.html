@@ -1,5 +1,5 @@
-{% extends "base.html" %}{% block title %}Books{% endblock %} {% block navbar %}
-{% if role == 'school_admin' %}
+{% extends "base2.html" %}{% block title %}Books{% endblock %} {% block navbar
+%} {% if role == 'school_admin' %}
 <a
   class="nav-item nav-link"
   id="school-admin"
@@ -15,7 +15,7 @@
 <ul>
   {% for row in rows %}
   <li class="product">
-    <div style="margin-right:7px">
+    <div style="margin-right: 7px">
       <img
         src="{{image_url[loop.index0]}}"
         alt="{{ row[0] }}"

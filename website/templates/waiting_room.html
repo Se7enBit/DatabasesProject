@@ -1,25 +1,30 @@
-{% extends "base.html" %}
-{% block title %}Waiting Room{% endblock %}
-
-{%block content%}
+{% extends "base2.html" %} {% block title %}Waiting Room{% endblock %} {%block
+content%}
 <style>
-    .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
+  .center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 </style>
 
-
-<h1 style="text-align: center;">Waiting Room</h1>
+<h1 style="text-align: center">Waiting Room</h1>
 <p>
-    Welcome to our waiting room. This is the only place you can visit until 
-    our admin approves your acount. This proccess may take several days. Until
-    then, please enjoy our hospitality and tasteful music.
+  Welcome to our waiting room. This is the only place you can visit until our
+  admin approves your acount. This proccess may take several days. Until then,
+  please enjoy our hospitality and tasteful music.
 </p>
-<img src="static/images/waiting-room.jpg" alt="What a nice waiting room! How jolly!" class="center"/>
+<img
+  src="static/images/waiting-room.jpg"
+  alt="What a nice waiting room! How jolly!"
+  class="center"
+/>
 
-<audio src="static/sound/wii-music.mp3" autoplay loop>
-    look like there is no music for you...
+<audio
+  src="static/sound/wii-music.mp3"
+  autoplay
+  loop
+>
+  look like there is no music for you...
 </audio>
 {%endblock%}
