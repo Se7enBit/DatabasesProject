@@ -116,6 +116,7 @@ def book_page(book_id):
                 db.connection.commit()
                 cur.close()
                 flash("Your rating has been posted successfuly!", category='info')
+                return redirect(url_for('views.book_page', book_id= book_id))
 
         return render_template("book_page.html", user=current_user, book_id=book_info[0],
                                name=book_info[1], publisher=book_info[2], isbn=book_info[3],
