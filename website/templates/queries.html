@@ -88,11 +88,37 @@
         name="query1.2"
         class="btn btn-primary"
       >
-        List of registered schools
+        Filter by Categories
       </button>
+      <select
+        id="category"
+        name="category"
+      >
+        {% for category in categories %}
+        <option value="{{category}}">{{category}}</option>
+        {% endfor %}
+      </select>
+      {% if query1_2 %}
+      <br /><br />
+      <h6 style="text-align: left; text-decoration-line: underline">
+        Writers inside
+        <span style="color: navy">"{{q2_category}}"</span> category:
+      </h6>
       <ul>
-        {% if query1_2 %} {% for query in query1_2 %}
-        <li>{{query[0]}} | {{query [1]}}</li>
+        {% for query in query1_2 %}
+        <li>{{query[0]}} {{query[1]}}</li>
+        {% endfor %}
+      </ul>
+      <br /><br />
+      <h6 style="text-align: left; text-decoration-line: underline">
+        Teachers that have rented from<span style="color: navy">
+          "{{q2_category}}"</span
+        >
+        category the past year:
+      </h6>
+      <ul>
+        {% for query in query1_2help %}
+        <li>{{query[0]}} {{query[1]}}</li>
         {% endfor %} {% endif %}
       </ul>
     </div>

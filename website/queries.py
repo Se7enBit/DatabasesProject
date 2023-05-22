@@ -9,6 +9,8 @@ queries = Blueprint("queries", __name__)
 def run_query():
   query1 = None
   query2 = None
+  query2help = None
+  category = None
 
   if request.method == "POST":
     if "query1.1" in request.form:
@@ -52,9 +54,16 @@ def run_query():
         cur.close()
                       
     if "query1.2" in request.form:
+      category = request.form.get("category")
+
       cur = db.connection.cursor()
-      cur.execute("SELECT * from school")
+      cur.execute(f"SELECT DISTINCT w.first_name, w.last_name FROM writer as w JOIN book_writer as bw ON bw.writer_id = w.id JOIN book as b ON b.id = bw.book_id WHERE FIND_IN_SET('{category}', b.category) > 0;")
       query2= cur.fetchall()
       cur.close()
 
-    return render_template("queries.html", query1_1=query1, query1_2=query2, user=current_user, role=session["user_role"])
+      cur = db.connection.cursor()
+      cur.execute(f"SELECT DISTINCT au.first_name, au.last_name FROM app_user as au JOIN book_rental as br ON br.app_user_id = au.id JOIN book as b ON b.id = br.book_id WHERE au.user_role = 'teacher' AND b.category IN ('{category}') AND br.rental_datetime >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR);")      
+      query2help = cur.fetchall()
+      cur.close()
+
+    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, categories=session["categories"], user=current_user, role=session["user_role"])

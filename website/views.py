@@ -128,7 +128,17 @@ def book_page(book_id):
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
 def queries():
-    return render_template("queries.html", user=current_user, role=session["user_role"])
+    cur= db.connection.cursor()
+    cur.execute("SELECT DISTINCT category FROM book;")
+    results = cur.fetchall()
+    cur.close()
+    cats = set()
+    for result in results:
+        category_set = set(result[0].split(','))
+        cats.update(category_set)
+    categories = sorted(cats)
+    session["categories"] = categories
+    return render_template("queries.html", user=current_user, role=session["user_role"], categories=categories)
 
 @views.route("/school-admin", methods=["GET", "POST"])
 @login_required
