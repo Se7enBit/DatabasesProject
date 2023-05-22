@@ -112,6 +112,7 @@ def book_page(book_id):
                 cur = db.connection.cursor()
                 print(f"""Running querry: INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
                 cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
+                db.connection.commit()
                 cur.close()
                 flash("Your rating has been posted successfuly!", category='info')
 
