@@ -41,4 +41,57 @@
     Home Page
   </h1>
 </div>
+<!-- Home page of students and teachers -->
+{% if role == 'student' or role == 'teacher' %}
+<h2>My Books</h2>
+{% if data["num_rented"] == 0 %}
+  <div class="product">
+    <p>You do not have any rented books.</p>
+  </div>
+{% else %}
+  {% for book in data["rented"]%}
+  <div class="product">
+    <img src="{{book[8]}}"
+          alt="Book Cover"
+            style="margin:20px;"
+            width="100">
+        <div class="book-details">
+          <h3 class="product-title">{{book[1]}}</h3>
+          <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
+          <p class="book-description"><b>Status:</b> {{book[-1]}}</p>
+          {% if book[-1]=='reservation' %}
+            <p class="book-description"><b>Reserved since:</b> {{book[-4]}}</p>
+          {% else %}
+          <p class="book-description"><b>Rented since:</b> {{book[-3]}}</p>
+          {% endif %}
+        </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<br>
+<h3>Older Books</h3>
+  {% if data["num_returned"] == 0 %}
+  <div class="product">
+    <p>There are no books in your history.</p>
+  </div>
+{% else %}
+  {% for book in data["returned"]%}
+  <div class="product">
+    <img src="{{book[8]}}"
+          alt="Book Cover"
+            style="margin:20px;"
+            width="100">
+        <div class="book-details">
+          <h3 class="product-title">{{book[1]}}</h3>
+          <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
+          <p class="book-description"><b>Status:</b> {{book[-1]}}</p>
+            <p class="book-description"><b>Returned at:</b> {{book[-2]}}</p>
+        </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<br><br><br>
+{% endif %}
 {% endblock %}

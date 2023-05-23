@@ -22,8 +22,29 @@ def home():
         session["school_id"]= info[0]
         session["school_name"]= info[1]
         session["user_role"]=info[2]
+        
+        #Here you can add any data that you want to pass to the home page
+        data={}
 
-        return render_template("home.html", user = current_user, role=session["user_role"])
+        #Get info for student and teacher home page
+        if session["user_role"] in ["student", "teacher"]:
+            cur = db.connection.cursor()
+            cur.execute(f"""select book.*, book_rental.request_datetime, book_rental.rental_datetime, book_rental.return_datetime, book_rental.rental_status
+                        from book join book_rental ON book.id = book_rental.book_id
+                        where book_rental.app_user_id = {session["_user_id"]} and book_rental.rental_status in ("reservation", "rented", "late to return", "returned");""")
+            rented_books = cur.fetchall()
+            cur.close()
+
+            data["rented"] = [book for book in rented_books if book[-1] in ["reservation", "rented", "late to return"]]
+            data["returned"] = [book for book in rented_books if book[-1] == "returned"]
+            data["num_rented"] = len(data["rented"])
+            data["num_returned"] = len(data["returned"])
+
+            print(f"rented: {data['rented']}")
+            print(f"returned: {data['returned']}")
+
+        #!Use the data dictionary to pass any data to home page
+        return render_template("home.html", user = current_user, role=session["user_role"], data=data)
     
 @views.route("/books", methods=["GET", "POST"])
 @login_required
