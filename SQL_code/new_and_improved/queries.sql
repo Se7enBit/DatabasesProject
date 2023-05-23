@@ -45,3 +45,19 @@ SELECT app_user.first_name,
 FROM app_user
     JOIN book_rental ON book_rental.app_user_id = app_user.id
 WHERE book_rental.rental_status = "late to return";
+
+--3.1.2 (first part)
+SELECT writer.* FROM writer JOIN book_writer
+    -> ON writer.id = book_writer.writer_id
+    -> JOIN book ON book.id = book_writer.book_id
+    -> WHERE book.category = "art";
+
+--3.2.3 by user
+SELECT rating FROM book_rating JOIN app_user
+    ON book_rating.app_user_id = app_user.id
+    WHERE app_user.id=10;
+
+--3.2.3 by category
+SELECT book_rating.* FROM book_rating JOIN book 
+    ON book_rating.book_id = book.id
+    WHERE book.category = "art";
