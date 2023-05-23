@@ -143,6 +143,143 @@
       </ul>
     </div>
   </form>
-</div>
+  <form
+    action="/run-query"
+    method="post"
+  >
+    <div class="form-group">
+      <button
+        type="submit"
+        name="query2.1"
+        class="btn btn-primary"
+      >
+        Filter books (2.1)
+      </button>
+      <h6 style="text-align: left; text-decoration-line: underline">
+        Filter by:
+      </h6>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="titleCheckbox"
+            onchange="toggleInputs2()"
+          />
+          Title
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="categoryCheckbox"
+            onchange="toggleInputs2()"
+          />
+          Category
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="writerCheckbox"
+            onchange="toggleInputs2()"
+          />
+          Writer
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="copiesCheckbox"
+            onchange="toggleInputs2()"
+          />
+          Number of Copies
+        </label>
+        <div
+          id="titleInput"
+          style="display: none"
+        >
+          <label for="title">
+            Title:
+            <input
+              type="text"
+              id="title"
+              name="title"
+            />
+          </label>
+        </div>
 
+        <div
+          id="categoryInput"
+          style="display: none"
+        >
+          <label for="category">
+            Category:
+            <select
+              id="category"
+              name="category"
+            >
+              {% for category in categories %}
+              <option value="{{category}}">{{category}}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div
+          id="writerInput"
+          style="display: none"
+        >
+          <label for="writer">
+            Writer:
+            <input
+              type="text"
+              id="writer"
+              name="writer"
+            />
+          </label>
+        </div>
+
+        <div
+          id="copiesInput"
+          style="display: none"
+        >
+          <label for="copies">
+            Copies:
+            <input
+              type="number"
+              id="copies"
+              name="copies"
+              min="0"
+              step="1"
+            />
+          </label>
+        </div>
+      </div>
+
+      <ul>
+        {% if query2_1 %} {% for book in query2_1 %}
+        <li class="product">
+          <div style="margin-right: 7px">
+            <img
+              src="{{query2_1help[loop.index0]}}"
+              alt="{{ book[1] }}"
+              width="100"
+            />
+          </div>
+          <div>
+            <h4><a href="/books/{{book[2]}}">{{ book[3] }}</a></h4>
+            <p>{{book[0]}} {{book[1]}}</p>
+          </div>
+        </li>
+        {% endfor %} {% endif %}
+      </ul>
+    </div>
+  </form>
+</div>
+<script>
+  document.getElementById("copiesInput").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+      this.setCustomValidity("Please enter a positive integer.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
 {% endblock %}

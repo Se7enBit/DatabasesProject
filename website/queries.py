@@ -14,6 +14,8 @@ def run_query():
   query2help = None
   category = None
   query3 = None
+  query4 = None
+  query2_1help = None
 
   if request.method == "POST":
     if "query1.1" in request.form:
@@ -75,7 +77,38 @@ def run_query():
       query3= cur.fetchall()
       cur.close()
 
-    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, query1_3= query3,categories=session["categories"], user=current_user, role=session["user_role"])
+    if "query2.1" in request.form:
+      query = None
+      if ("titleCheckbox") in request.form:
+        title = request.form.get("title")
+        if title:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE book.title LIKE '%{title}%';"
+      elif ("categoryCheckbox") in request.form:
+        category = request.form.get("category")
+        if category:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE FIND_IN_SET('{category}', category);"
+      elif ("writerCheckbox") in request.form:
+        writer = request.form.get("writer")
+        if writer:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE writer.last_name LIKE '%{writer}%' OR writer.first_name LIKE '%{writer}%';"
+      elif ("copiesCheckbox") in request.form:
+        copies = request.form.get("copies")
+        if copies:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
+
+
+      if query:
+        cur = db.connection.cursor()
+        cur.execute(query)
+        query4 = cur.fetchall()
+        cur.close()
+        query2_1help = []
+        ids=[]            
+        for index, book in enumerate(query4):
+          ids.append(book[2]-1)         
+          query2_1help.append(url_for('static', filename=f'images/{ids[index]}.png'))
+
+    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, query1_3= query3, categories=session["categories"], query2_1=query4,query2_1help=query2_1help, user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])
 @login_required
