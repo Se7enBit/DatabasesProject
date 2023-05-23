@@ -102,6 +102,7 @@ def book_page(book_id):
         average_rating=0
         for row in ratings: average_rating += int(row[1])
         if len(ratings)!=0: average_rating/=len(ratings)
+        average_rating=round(average_rating, 1)
 
         #This loads when you post a comment:
         if request.method=="POST" and "comment" in request.form and "rating" in request.form:

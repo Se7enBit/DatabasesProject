@@ -67,3 +67,8 @@ def run_query():
       cur.close()
 
     return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, categories=session["categories"], user=current_user, role=session["user_role"])
+  
+@queries.route("/rent-book", methods=["POST"])
+@login_required
+def rent_book():
+  return
