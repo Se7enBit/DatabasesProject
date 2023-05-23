@@ -123,6 +123,26 @@
       </ul>
     </div>
   </form>
+  <br />
+  <form
+    action="/run-query"
+    method="post"
+  >
+    <div class="form-group">
+      <button
+        type="submit"
+        name="query1.3"
+        class="btn btn-primary"
+      >
+        Top 10 Teachers in rents under 40 years old
+      </button>
+      <ul>
+        {% if query1_3 %} {% for query in query1_3 %}
+        <li>{{query[3]}} {{query[1]}} {{query [2]}}</li>
+        {% endfor %} {% endif %}
+      </ul>
+    </div>
+  </form>
 </div>
 
 {% endblock %}

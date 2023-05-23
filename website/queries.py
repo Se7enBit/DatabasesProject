@@ -13,6 +13,7 @@ def run_query():
   query2 = None
   query2help = None
   category = None
+  query3 = None
 
   if request.method == "POST":
     if "query1.1" in request.form:
@@ -67,8 +68,14 @@ def run_query():
       cur.execute(f"SELECT DISTINCT au.first_name, au.last_name FROM app_user as au JOIN book_rental as br ON br.app_user_id = au.id JOIN book as b ON b.id = br.book_id WHERE au.user_role = 'teacher' AND b.category IN ('{category}') AND br.rental_datetime >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR);")      
       query2help = cur.fetchall()
       cur.close()
+    
+    if "query1.3" in request.form:
+      cur = db.connection.cursor()
+      cur.execute("SELECT au.id, au.first_name, au.last_name, COUNT(*) AS rent_count FROM app_user AS au JOIN book_rental AS br ON au.id = br.app_user_id JOIN book ON br.book_id = book.id WHERE au.user_role = 'teacher' AND au.birthdate > DATE_SUB(NOW(), INTERVAL 40 YEAR) AND br.rental_status IN ('rented', 'returned') GROUP BY au.id, au.first_name, au.last_name ORDER BY rent_count DESC LIMIT 10;")
+      query3= cur.fetchall()
+      cur.close()
 
-    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, categories=session["categories"], user=current_user, role=session["user_role"])
+    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, query1_3= query3,categories=session["categories"], user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])
 @login_required
