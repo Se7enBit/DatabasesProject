@@ -25,6 +25,8 @@ def home():
         
         #Here you can add any data that you want to pass to the home page
         data={}
+        img_for_returned = None
+        img_for_rented = None
 
         #Get info for student and teacher home page
         if session["user_role"] in ["student", "teacher"]:
@@ -38,14 +40,18 @@ def home():
             img_for_returned=[]
             ids_rented =[]
             ids_returned=[]
+            i=0
+            j=0
             #[13] gives the status
-            for index, rented_book in enumerate(rented_books):
+            for rented_book in rented_books:
                 if rented_book[13] == "rented":
                     ids_rented.append(rented_book[0]-1)
-                    img_for_rented.append(url_for('static', filename=f'images/{ids_rented[index]}.png'))
+                    img_for_rented.append(url_for('static', filename=f'images/{ids_rented[i]}.png'))
+                    i = i+1
                 elif rented_book[13] == "returned":
                     ids_returned.append(rented_book[0]-1)
-                    img_for_returned.append(url_for('static', filename=f'images/{ids_returned[index]}.png'))
+                    img_for_returned.append(url_for('static', filename=f'images/{ids_returned[j]}.png'))
+                    j=j+1
             
             #doesnt work cause after that mike 
 

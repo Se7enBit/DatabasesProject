@@ -2,8 +2,6 @@
 
 Databases Semester Project
 
-Αυτη τη στιγμη το login έχει ένα θεματάκι (πολλά) αλλά οι ήδη υπάρχοντες users έχουν τους κωδικούς τους αποθηκευμένους σε κανονική μορφή ενώ για ασφάλεια εμείς έχουμε βάλει στο sign up να γίνεται generate_password_hash οπότε δεν είναι συμβατοί οι κωδικοί και ο έλεγχος επιστρέφει None. Θα αφαιρέσω για αρxή τον έλεγχο με το hash, να τσεκάρει απλά ότι το password με το attribute του user: userpassword κάνουν match.
-
 Το chatgpt εξηγεί πολύ καλά αυτή την διαφοροποίηση:
 
 redirect(url_for("views.home")) is used to redirect the user to a different page in your Flask application. When the user accesses the page containing this code, they will be immediately redirected to the specified page, which in this case is the home view function in the views module. This is useful when you want to force the user to go to a different page, for example after they have submitted a form or when they are not authorized to access a certain page.
@@ -14,16 +12,3 @@ for future use, QUERY to activate a user:
 UPDATE app_user
 SET is_active = 1
 WHERE username = "user_to_be_activated";
-
-get books per school:
-SELECT book_copies_per_school.\*
-FROM book_copies_per_school
-WHERE book_copies_per_school.school_id = "school_id(placeholder)";
-
-query to get school name from user_id
-"""
-cur = db.connection.cursor()
-cur.execute("SELECT s.appellation FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = %s", [user_id])
-school = cur.fetchone()
-cur.close()
-"""
