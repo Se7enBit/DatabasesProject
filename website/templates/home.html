@@ -57,7 +57,7 @@
     width="100"
   />
   <div class="book-details">
-    <h3 class="product-title">{{book[1]}}</h3>
+    <h3 class="product-title"><a href="/books/{{book[0]}}">{{book[1]}}</a></h3>
     <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
     {% if book[-1] == 'late to return'%}
     <p class="book-description">
@@ -89,7 +89,7 @@
     width="100"
   />
   <div class="book-details">
-    <h3 class="product-title">{{book[1]}}</h3>
+    <h3 class="product-title"><a href="/books/{{book[0]}}">{{book[1]}}</a></h3>
     <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
     <p class="book-description"><b>Status:</b> {{book[-1]}}</p>
     <p class="book-description"><b>Returned at:</b> {{book[-2]}}</p>
