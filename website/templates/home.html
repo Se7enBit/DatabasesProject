@@ -58,8 +58,12 @@
         <div class="book-details">
           <h3 class="product-title">{{book[1]}}</h3>
           <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
+          {% if book[-1] == 'late to return'%}
+            <p class="book-description"><b>Status:</b> <font color="red">{{book[-1]}}</font></p>
+          {% else %}
           <p class="book-description"><b>Status:</b> {{book[-1]}}</p>
-          {% if book[-1]=='reservation' %}
+          {% endif %}
+          {% if book[-1] =='reservation' %}
             <p class="book-description"><b>Reserved since:</b> {{book[-4]}}</p>
           {% else %}
           <p class="book-description"><b>Rented since:</b> {{book[-3]}}</p>
