@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, flash, jsonify, url_for, redirect, session
 from flask_login import login_required, current_user
 from . import db
-from SQL_code.rental_package import book_renter
+from SQL_code.rental_package import book_renter as br
+import mysql.connector
+
 queries = Blueprint("queries", __name__)
 
 @queries.route("/run-query", methods=["POST"])
@@ -72,12 +74,21 @@ def run_query():
 @login_required
 def rent_book():
   if request.method != "POST": return redirect(url_for("views.home"))
-  print(session)
+  avail = int(request.form.get("avail_books"))
+
   app_user_id = session["_user_id"]
   requested_book_id = request.form.get("book_id")
-  action = ""
+  if avail > 0: action = "rented" 
+  else: action = "reservation"
   school = session["school_id"]
 
-  cur = db.connection.cursor()
-  #book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
+  mydb = mysql.connector.connect( host = 'localhost',
+                                user = 'root',
+                                database = 'school_library')
+  mycursor = mydb.cursor(buffered = True)
+  mycursor.execute(f'SELECT school FROM app_user WHERE id = {app_user_id}')
+
+  print("Calling book_rental_runner")
+  br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
+  #flash("Your request has been submitted. Please wait for your library admin to accept it.", category="info")
   return redirect(url_for("views.home"))

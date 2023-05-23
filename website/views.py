@@ -40,9 +40,6 @@ def home():
             data["num_rented"] = len(data["rented"])
             data["num_returned"] = len(data["returned"])
 
-            print(f"rented: {data['rented']}")
-            print(f"returned: {data['returned']}")
-
         #!Use the data dictionary to pass any data to home page
         return render_template("home.html", user = current_user, role=session["user_role"], data=data)
     

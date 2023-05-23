@@ -32,6 +32,7 @@
           <p class="book-description"><b></br>Available:</b> {{available[1]}}/{{available[0]}}</p>
           <form action="{{ url_for('queries.rent_book') }}" method="post">
             <input type="hidden" name="book_id" value="{{book_id}}">
+            <input type="hidden" name="avail_books" value={{available[1]}}>
             <button class="button">Order</button>
           </form>
         </div>
