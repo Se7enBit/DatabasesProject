@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, flash, jsonify, url_for, session
+from flask import Blueprint, render_template, request, flash, jsonify, url_for, redirect, session
 from flask_login import login_required, current_user
 from . import db
-
+from SQL_code.rental_package import book_renter
 queries = Blueprint("queries", __name__)
 
 @queries.route("/run-query", methods=["POST"])
@@ -71,4 +71,13 @@ def run_query():
 @queries.route("/rent-book", methods=["POST"])
 @login_required
 def rent_book():
-  return
+  if request.method != "POST": return redirect(url_for("views.home"))
+  print(session)
+  app_user_id = session["_user_id"]
+  requested_book_id = request.form.get("book_id")
+  action = ""
+  school = session["school_id"]
+
+  cur = db.connection.cursor()
+  #book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
+  return redirect(url_for("views.home"))
