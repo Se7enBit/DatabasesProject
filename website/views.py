@@ -150,11 +150,14 @@ def book_page(book_id):
                 rating = request.form.get("rating")
                 comment = request.form.get("comment")
                 cur = db.connection.cursor()
-                print(f"""Running querry: INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
-                cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', 1);""")
+                is_published = 0
+                if session["user_role"] == 'teacher':
+                    is_published = 1
+                print(f"""Running querry: INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', {is_published});""")
+                cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', {is_published});""")
                 db.connection.commit()
                 cur.close()
-                flash("Your rating has been posted successfuly!", category='info')
+                flash("Your rating has been posted!", category='info')
                 return redirect(url_for('views.book_page', book_id= book_id))
 
         return render_template("book_page.html", user=current_user, book_id=book_info[0],
@@ -192,18 +195,45 @@ def school_admin():
         unpublished_ratings = None
 
         cur = db.connection.cursor()
-        cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 1;")
+        cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0;")
         inactive_users= cur.fetchall()
         cur.close()
 
         cur = db.connection.cursor()
-        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 1 AND au.school = {school_id};")
+        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
         unpublished_ratings= cur.fetchall()
         cur.close()
         print(unpublished_ratings)
 
         return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
-    
+
+@views.route("/set-active", methods=["POST"])
+@login_required
+def set_active():
+    if session["user_role"] == "school_admin":
+        user_id = request.form.get("user_id")
+        cur = db.connection.cursor()
+        cur.execute(f"UPDATE app_user SET is_active = 1 WHERE id = '{user_id}';")
+        db.connection.commit()
+        cur.close()
+        flash("User activated succesfully", category="success")
+
+    return redirect(url_for("views.school_admin"))
+
+@views.route("/publish-rating", methods=["POST"])
+@login_required
+def publish_rating():
+    if session["user_role"] == "school_admin":
+        rating_id = request.form.get("rating_id")
+        cur = db.connection.cursor()
+        cur.execute(f"UPDATE book_rating SET is_published = 1 WHERE id = {rating_id};")
+        db.connection.commit()
+        cur.close()
+        flash("Rating published succesfully", category="success")
+
+    return redirect(url_for("views.school_admin"))
+
+
 @views.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():

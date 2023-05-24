@@ -67,7 +67,7 @@ def run_query():
       cur.close()
 
       cur = db.connection.cursor()
-      cur.execute(f"SELECT DISTINCT au.first_name, au.last_name FROM app_user as au JOIN book_rental as br ON br.app_user_id = au.id JOIN book as b ON b.id = br.book_id WHERE au.user_role = 'teacher' AND b.category IN ('{category}') AND br.rental_datetime >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR);")      
+      cur.execute(f"SELECT DISTINCT au.first_name, au.last_name FROM app_user as au JOIN book_rental as br ON br.app_user_id = au.id JOIN book as b ON b.id = br.book_id WHERE au.user_role = 'teacher' AND FIND_IN_SET('{category}', b.category) > 0 AND br.rental_datetime >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR);")      
       query2help = cur.fetchall()
       cur.close()
     

@@ -9,28 +9,69 @@ block navbar %} {% if role == 'school_admin' %}
 {% endif %} {% endblock %} {% block content %}
 <h1 align="center">{{school}} Admin Page</h1>
 <div class="container">
-  <h6 style="text-align: left; text-decoration-line: underline">
-    Inactive Users
-  </h6>
-  <ul>
-    {% for user in users %}
-    <li>{{user[1]}} {{user[2]}} , role: {{user[5]}}</li>
-    {% endfor %}
-  </ul>
+  <div class="product">
+    <h6 style="text-align: left; text-decoration-line: underline">
+      Inactive Users
+    </h6>
+    <ul>
+      {% for user in users %}
+      <li class="book-description">
+        {{user[1]}} {{user[2]}} , role: {{user[5]}}
+        <form
+          action="/set-active"
+          method="POST"
+          style="display: inline"
+        >
+          <input
+            type="hidden"
+            name="user_id"
+            value="{{ user[0] }}"
+          />
+          <button
+            type="submit"
+            class="btn btn-sm btn-success"
+          >
+            Activate
+          </button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </div>
 <div class="container">
-  <h6 style="text-align: left; text-decoration-line: underline">
-    Unpublished Ratings
-  </h6>
-  <ul>
-    {% for rating in ratings %}
-    <li>
-      <pre>
+  <div class="product">
+    <h6 style="text-align: left; text-decoration-line: underline">
+      Unpublished Ratings
+    </h6>
+    <ul>
+      {% for rating in ratings %}
+      <li>
+        <pre>
 For: {{rating[1]}} From: {{rating[2]}} Rating: {{rating[3]}}
 Comment: {{rating[4]}}
-      </pre>
-    </li>
-    {% endfor %}
-  </ul>
+      </pre
+        >
+        <form
+          action="/publish-rating"
+          method="POST"
+          style="display: inline"
+        >
+          <input
+            type="hidden"
+            name="rating_id"
+            value="{{ rating[0] }}"
+          />
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary"
+          >
+            Publish
+          </button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </div>
 {% endblock %}
