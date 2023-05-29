@@ -200,7 +200,17 @@ def queries():
         cats.update(category_set)
     categories = sorted(cats)
     session["categories"] = categories
-    return render_template("queries.html", user=current_user, role=session["user_role"], categories=categories)
+
+    #Get School users
+    cur = db.connection.cursor()
+    cur.execute(f"""SELECT id, username FROM app_user WHERE school="{session['school_id']}" ORDER BY username;""")
+    school_users = cur.fetchall()
+    session["school_users"]=[]
+    for user in school_users: session["school_users"].append(user)
+    cur.close()
+    
+    return render_template("queries.html", user=current_user, role=session["user_role"], 
+                           categories=categories, school_users=session["school_users"])
 
 @views.route("/school-admin", methods=["GET", "POST"])
 @login_required

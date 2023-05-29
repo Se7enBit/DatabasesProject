@@ -2,6 +2,7 @@
 {% block content %}
 <h1 align="center">Advanced Tools</h1>
 <div class="container">
+  <!-- Rents per School -->
   <form
     action="/run-query"
     method="post"
@@ -71,6 +72,8 @@
       </ul>
     </div>
   </form>
+  
+  <!-- Filter by Categories -->
   <form
     action="/run-query"
     method="post"
@@ -116,7 +119,8 @@
       </ul>
     </div>
   </form>
-  <br />
+  
+  <!-- Top 10 Teachers in rents under 40 years old -->
   <form
     action="/run-query"
     method="post"
@@ -136,6 +140,8 @@
       </ul>
     </div>
   </form>
+  
+  <!-- Filter Books -->
   <form
     action="/run-query"
     method="post"
@@ -263,6 +269,75 @@
         {% endfor %} {% endif %}
       </ul>
     </div>
+  </form>
+
+  <!-- Average Rating -->
+  <form
+    action="/run-query"
+    method="post"
+  >
+    <div class="form-group">
+      <button
+        type="submit"
+        name="query2.3"
+        class="btn btn-primary"
+      >
+        Average Rating
+      </button>
+      <h6 style="text-align: left; text-decoration-line: underline">
+        Filter by:
+      </h6>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="userCheckbox"
+            onchange="toggleInputs3()"
+          />
+          User
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="categoryCheckbox2"
+            onchange="toggleInputs3()"
+          />
+          Category
+        </label>
+        <div id="userInput"
+          style="display: none"
+        >
+          <label for="user">
+            User:
+            <select
+              id="user"
+              name="user"
+            >
+              {% for user in school_users %}
+              <option value="{{user[0]}}">{{user[1]}} ({{user[0]}})</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div id="categoryInput2"
+          style="display: none"
+        >
+          <label for="category">
+            Category:
+            <select
+              id="category"
+              name="category"
+            >
+              {% for category in categories %}
+              <option value="{{category}}">{{category}}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+      </div>
+      {% if query2_3 %}
+        <p>{{query2_3[1]}} <b>Average Rating: </b>{{query2_3[0]}}</p>
+      {% endif %}
   </form>
 </div>
 <script>

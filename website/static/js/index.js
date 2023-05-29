@@ -16,7 +16,7 @@ function toggleInputs() {
       yearInput.style.display = 'none';
       monthInput.style.display = 'none';
     }
-  }
+}
 
 function toggleInputs2() {
   const titleCheckbox = document.querySelector('input[name="titleCheckbox"]');
@@ -75,4 +75,28 @@ function toggleInputs2() {
     writerInput.style.display = 'none';
   }
 
+}
+
+function toggleInputs3() {
+  const userCheckbox = document.querySelector('input[name="userCheckbox"]');
+  const categoryCheckbox = document.querySelector('input[name="categoryCheckbox2"]');
+  const userInput = document.getElementById('userInput');
+  const categoryInput = document.getElementById('categoryInput2');
+
+  if (userCheckbox.checked) {
+    categoryInput.style.display = 'none';
+    userInput.style.display = 'block';
+    categoryCheckbox.checked = false;
+  } 
+
+  else if (categoryCheckbox.checked) {
+    userInput.style.display = 'none';
+    categoryInput.style.display = 'block';
+    userCheckbox.checked = false;
+  } 
+  
+  else {
+    userInput.style.display = 'none';
+    categoryInput.style.display = 'none';
+  }
 }

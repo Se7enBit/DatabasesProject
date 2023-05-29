@@ -53,11 +53,11 @@ SELECT writer.* FROM writer JOIN book_writer
     -> WHERE book.category = "art";
 
 --3.2.3 by user
-SELECT rating FROM book_rating JOIN app_user
+SELECT AVG(rating) FROM book_rating JOIN app_user
     ON book_rating.app_user_id = app_user.id
     WHERE app_user.id=10;
 
 --3.2.3 by category
-SELECT book_rating.* FROM book_rating JOIN book 
+SELECT AVG(book_rating.rating) FROM book_rating JOIN book 
     ON book_rating.book_id = book.id
     WHERE book.category = "art";
