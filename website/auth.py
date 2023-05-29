@@ -16,6 +16,7 @@ from flask_login import (
     current_user,
 )
 from . import login_manager, db
+import hashlib
 
 auth = Blueprint("auth", __name__)
 
@@ -67,7 +68,8 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        user = User.authenticate(username, password)
+        md5_password = hashlib.md5(password.encode()).hexdigest()
+        user = User.authenticate(username, md5_password)
 
         if not user:
             flash("Invalid username or password", category="error")
@@ -75,7 +77,7 @@ def login():
         
         if not user.is_active:
             session["username"]=username
-            session["password"]=password
+            session["password"]=hashlib.md5(password.encode()).hexdigest()
             return redirect(url_for("auth.waiting_room"))
         session["username"]=username
         login_user(user, remember=True)
@@ -128,7 +130,7 @@ def sign_up():
             #password = generate_password_hash(password1, method="sha256")
             cur = db.connection.cursor()
             cur.execute(
-                "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, md5(%s))",
                 (first_name, last_name, birthdate, school, user_role, username, password1),
             )
             db.connection.commit()
