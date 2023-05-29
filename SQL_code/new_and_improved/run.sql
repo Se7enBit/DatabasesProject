@@ -1,5 +1,5 @@
 GRANT FILE ON *.* TO 'root'@'localhost';
-
+SET NAMES utf8mb4;
 source ./Database/School_Library_Database.sql;
 source ./Database/app_user_triggers.sql;
 source ./Database/book_rental_triggers.sql;
