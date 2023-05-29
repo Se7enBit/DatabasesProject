@@ -14,14 +14,16 @@ def home():
     if current_user.is_anonymous:
         return render_template("login.html")
     else:
+        if current_user.get_id() == 1:
+            return redirect(url_for("views.admin"))
         cur = db.connection.cursor()
         id=current_user.get_id()
         cur.execute(f"SELECT s.id AS school_id, s.appellation AS school_appellation, au.user_role AS user_role FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = {id};")
         info = cur.fetchone()
         cur.close()
         session["school_id"]= info[0]
-        session["school_name"]= info[1]
-        session["user_role"]=info[2]
+        session["school_name"]= info[1] 
+        session["user_role"]= info[2]
         
         #Here you can add any data that you want to pass to the home page
         data={}
@@ -71,7 +73,7 @@ def home():
             unpublished_ratings = None
 
             cur = db.connection.cursor()
-            cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0;")
+            cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0 AND user_role IN ('student', 'teacher');")
             inactive_users= cur.fetchall()
             cur.close()
 
@@ -330,3 +332,10 @@ def profile():
         info.append(result[2])
         info.append(result[3])
         return render_template("profile.html", user=current_user, school=session["school_name"], info=info, role=session["user_role"])
+
+@views.route("/admin", methods=["GET", "POST"])
+@login_required
+def admin():
+    if current_user.get_id() != 1:
+        return redirect(url_for('views.login'))
+    return render_template("admin.html", user = current_user)

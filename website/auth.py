@@ -54,33 +54,37 @@ class User():
             authenticated_user = User(
             user[0], user[7], user[8], user[6], True
         )
-            #if check_password_hash(user[8], password):
+            session["user_role"] = user[5]
             if (user[8]==password):
                 return authenticated_user
-        else:
-            return None
+        return None
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     session.clear()
     if current_user.is_authenticated:
+        if current_user.get_id() == 1:
+            return redirect(url_for('views.admin'))
         return redirect(url_for("views.home"))
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         md5_password = hashlib.md5(password.encode()).hexdigest()
         user = User.authenticate(username, md5_password)
+    
 
         if not user:
             flash("Invalid username or password", category="error")
             return render_template("login.html")
-        
+
         if not user.is_active:
             session["username"]=username
             session["password"]=hashlib.md5(password.encode()).hexdigest()
             return redirect(url_for("auth.waiting_room"))
         session["username"]=username
         login_user(user, remember=True)
+        if current_user.get_id() == 1:
+            return redirect(url_for('views.admin'))
         return redirect(url_for("views.home"))
     return render_template("login.html")
 

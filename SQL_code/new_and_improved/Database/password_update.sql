@@ -1,3 +1,4 @@
+UPDATE app_user SET userpassword = md5("tfutfu765fujh*(&") WHERE id = 1;
 UPDATE app_user SET userpassword = md5("tfutfu765fujh*(&") WHERE id = 2;
 UPDATE app_user SET userpassword = md5("tfutfu765fujh*(&") WHERE id = 3;
 UPDATE app_user SET userpassword = md5("tfutfu765fujh*(&") WHERE id = 4;
