@@ -12,6 +12,7 @@ def run_query():
   query1 = None
   query2 = None
   query2help = None
+  query2_3 = None
   category = None
   query3 = None
   query4 = None
@@ -103,12 +104,38 @@ def run_query():
         query4 = cur.fetchall()
         cur.close()
         query2_1help = []
-        ids=[]            
+        ids=[]
         for index, book in enumerate(query4):
           ids.append(book[2]-1)         
           query2_1help.append(url_for('static', filename=f'images/{ids[index]}.png'))
 
-    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, q2_category=category, query1_3= query3, categories=session["categories"], query2_1=query4,query2_1help=query2_1help, user=current_user, role=session["user_role"])
+    if "query2.3" in request.form:
+      query=None
+      criteria=None
+      if ("userCheckbox") in request.form:
+        user = request.form.get("user")
+        criteria = next((usr[1] for usr in session["school_users"] if usr[0]==int(user)), None)
+        if user:
+          query = f"SELECT AVG(rating) FROM book_rating JOIN app_user ON book_rating.app_user_id = app_user.id WHERE app_user.id={user};"
+      elif ("categoryCheckbox2") in request.form:
+        category = request.form.get("category")
+        criteria = category
+        if category:
+          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE book.category = '{category}';"""
+      
+      if query:
+        query2_3=['','']
+        cur = db.connection.cursor()
+        cur.execute(query)
+        query2_3[0] = cur.fetchone()[0]
+        if query2_3[0] == None: query2_3[0] = '-'
+        query2_3[1] = criteria
+        cur.close()
+
+    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
+                           q2_category=category, query1_3= query3, categories=session["categories"], 
+                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
+                           school_users=session["school_users"], user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])
 @login_required

@@ -101,3 +101,16 @@
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+
+/* Query Forms */
+.form-group {
+  /* margin-left: auto;
+  margin-right: auto; */
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #cfcece;
+  background-color:#f3f4f7;
+  width: 50%;
+}
