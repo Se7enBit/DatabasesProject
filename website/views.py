@@ -28,7 +28,7 @@ def home():
         img_for_returned = None
         img_for_rented = None
 
-        #Get info for student and teacher home page
+        #STUDENT AND TEACHER
         if session["user_role"] in ["student", "teacher"]:
             cur = db.connection.cursor()
             cur.execute(f"""select book.*, book_rental.request_datetime, book_rental.rental_datetime, book_rental.return_datetime, book_rental.rental_status
@@ -59,10 +59,30 @@ def home():
             data["returned"] = [book for book in rented_books if book[-1] == "returned"]
             data["num_rented"] = len(data["rented"])
             data["num_returned"] = len(data["returned"])
+            
+            #!Use the data dictionary to pass any data to home page
+            return render_template("home.html", user = current_user, role=session["user_role"], data=data, img_for_returned=img_for_returned, img_for_rented=img_for_rented)
 
-        #!Use the data dictionary to pass any data to home page
-        return render_template("home.html", user = current_user, role=session["user_role"], data=data, img_for_returned=img_for_returned, img_for_rented=img_for_rented)
-    
+        #SCHOOL ADMIN
+        elif session["user_role"] == "school_admin":
+            school=session["school_name"]
+            school_id=session["school_id"]
+            inactive_users = None
+            unpublished_ratings = None
+
+            cur = db.connection.cursor()
+            cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0;")
+            inactive_users= cur.fetchall()
+            cur.close()
+
+            cur = db.connection.cursor()
+            cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
+            unpublished_ratings= cur.fetchall()
+            cur.close()
+            print(unpublished_ratings)
+
+            return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
+
 @views.route("/books", methods=["GET", "POST"])
 @login_required
 def books():
