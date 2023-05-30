@@ -127,24 +127,46 @@
   <form
     action="/run-query"
     method="post"
+    class = "form-group"
   >
-    <div class="form-group">
-      <button
-        type="submit"
-        name="query1.3"
-        class="btn btn-primary"
-      >
-        Top 10 Teachers in rents under 40 years old
-      </button>
-      {% if query1_3 %}
-      <ul>
-        {% for query in query1_3 %}
-        <li>{{query[3]}} {{query[1]}} {{query [2]}}</li>
-        {% endfor %} {% endif %}
-      </ul>
-    </div>
+    <button
+      type="submit"
+      name="query1.3"
+      class="btn btn-primary"
+    >
+      Top 10 Teachers in rents under 40 years old
+    </button>
+    {% if query1_3 %}
+    <ul>
+      {% for query in query1_3 %}
+      <li>{{query[3]}} {{query[1]}} {{query [2]}}</li>
+      {% endfor %} {% endif %}
+    </ul>
   </form>
   
+  <!--3.1.4 Lonely writers -->
+  <form
+    action = "/run-query"
+    method = "post"
+    class = "form-group"
+    >
+    <button
+    type="submit"
+    name="query1.4"
+    class="btn btn-primary"
+    >
+    Lonely Writers ☹
+    </button>
+    {% if query1_4 %}
+      <p>Writers whose books have never been rented:</p>
+      <ul class = "scrollbox">
+        {% for writer in query1_4 %}
+          <li>{{writer[1]}} {{writer[2]}} ({{writer[0]}})</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </form>
+
   <!--3.1.5 Equal number of Rentals -->
   <form
     action = "/run-query"

@@ -12,7 +12,9 @@ def run_query():
   query1 = None
   query2 = None
   query2help = None
+  query1_4 = None
   query1_5 = None
+  query1_6 = None
   query1_7 = None
   query2_3 = None
   category = None
@@ -79,6 +81,12 @@ def run_query():
       cur.execute("SELECT au.id, au.first_name, au.last_name, COUNT(*) AS rent_count FROM app_user AS au JOIN book_rental AS br ON au.id = br.app_user_id JOIN book ON br.book_id = book.id WHERE au.user_role = 'teacher' AND au.birthdate > DATE_SUB(NOW(), INTERVAL 40 YEAR) AND br.rental_status IN ('rented', 'returned') GROUP BY au.id, au.first_name, au.last_name ORDER BY rent_count DESC LIMIT 10;")
       query3= cur.fetchall()
       cur.close()
+
+    if "query1.4" in request.form:
+      cur = db.connection.cursor()
+      cur.execute("SELECT w.* FROM writer w WHERE NOT EXISTS ( SELECT 1 FROM book_writer bw JOIN book_rental br ON bw.book_id = br.book_id WHERE bw.writer_id = w.id );")
+      query1_4= cur.fetchall()
+      cur.close()      
 
     if "query1.5" in request.form:
       query = None
@@ -167,8 +175,9 @@ def run_query():
         cur.close()
 
     return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
-                           q2_category=category, query1_3=query3, query1_5=query1_5, query1_7=query1_7,
-                           categories=session["categories"], query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
+                           q2_category=category, query1_3=query3, query1_4=query1_4, query1_5=query1_5,
+                           query1_6=query1_6, query1_7=query1_7,categories=session["categories"],
+                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
                            school_users=session["school_users"], user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])

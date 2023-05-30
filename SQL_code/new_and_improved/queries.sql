@@ -52,6 +52,16 @@ SELECT writer.* FROM writer JOIN book_writer
     -> JOIN book ON book.id = book_writer.book_id
     -> WHERE book.category = "art";
 
+--3.1.4 Writers whose books have never been rented
+SELECT w.*
+FROM writer w
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM book_writer bw
+  JOIN book_rental br ON bw.book_id = br.book_id
+  WHERE bw.writer_id = w.id
+);
+
 --3.2.3 by user
 SELECT AVG(rating) FROM book_rating JOIN app_user
     ON book_rating.app_user_id = app_user.id

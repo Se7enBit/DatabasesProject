@@ -180,7 +180,7 @@ def book_page(book_id):
                 cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', {is_published});""")
                 db.connection.commit()
                 cur.close()
-                flash("Your rating has been posted!", category='info')
+                flash("Rating submitted succesfully! It will be published when your school admin approves it.", category="success")
                 return redirect(url_for('views.book_page', book_id= book_id))
 
         return render_template("book_page.html", user=current_user, book_id=book_info[0],
@@ -261,7 +261,7 @@ def publish_rating():
         cur.execute(f"UPDATE book_rating SET is_published = 1 WHERE id = {rating_id};")
         db.connection.commit()
         cur.close()
-        flash("Rating published succesfully", category="success")
+        flash("Rating submitted succesfully! It will be published when your school admin approves it.", category="success")
 
     return redirect(url_for("views.school_admin"))
 
