@@ -202,6 +202,44 @@
     </div>
   </form>
 
+  <!--3.1.6 Category Pairs -->
+  <form
+    action = "/run-query"
+    method = "post"
+    class = "form-group"
+    >
+    <button
+    type="submit"
+    name="query1.6"
+    class="btn btn-primary"
+    >
+      Category Pairs
+    </button>
+    <br>
+    <span>1st category:</span>
+    <select
+    id="category1"
+    name="category1"
+    >
+    {% for category in categories %}
+    <option value="{{category}}">{{category}}</option>
+    {% endfor %}
+    </select>
+    <span>2nd category:</span>
+    <select
+    id="category2"
+    name="category2"
+    >
+    {% for category in categories %}
+    <option value="{{category}}">{{category}}</option>
+    {% endfor %}
+    </select>
+    {% if query1_6 %}
+      <br>
+      <p>{{query1_6}}</p>
+    {% endif %}
+  </form>
+
   <!--3.1.7 Writers with at least 5 books less than the one with the most -->
   <form
     action = "/run-query"

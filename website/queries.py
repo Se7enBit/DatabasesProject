@@ -114,6 +114,15 @@ def run_query():
         for username, num_rents in rentals:
           query1_5[num_rents] = [username]
 
+    if "query1.6" in request.form:
+      query = None
+      category1 = request.form.get("category1")
+      category2 = request.form.get("category2")
+      #vvv placeholders vvv#
+      print(f"1st category: {category1}")
+      print(f"2nd category: {category2}")
+      query1_6 = "The top 3 books with this pair of categories will appear here"
+
     if "query1.7" in request.form:
       cur = db.connection.cursor()
       cur.execute("SELECT writer.first_name, writer.last_name, COUNT(*) AS book_count FROM book_writer JOIN writer ON book_writer.writer_id = writer.id GROUP BY book_writer.writer_id  HAVING book_count < (SELECT MAX(book_count)  FROM (SELECT COUNT(*) AS book_count  FROM book_writer  GROUP BY writer_id) AS subquery)-5  ORDER BY book_count DESC;")
