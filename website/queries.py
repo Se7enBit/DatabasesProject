@@ -13,6 +13,7 @@ def run_query():
   query2 = None
   query2help = None
   query1_5 = None
+  query1_7 = None
   query2_3 = None
   category = None
   query3 = None
@@ -102,6 +103,12 @@ def run_query():
         if len(pairs[num_rents])>1: query1_5[num_rents]=pairs[num_rents]
       if query1_5 == {}: query1_5["note that the number of rentals must be greater than 20"]=["No","pairs","found"]
 
+    if "query1.7" in request.form:
+      cur = db.connection.cursor()
+      cur.execute("SELECT writer.first_name, writer.last_name, COUNT(*) AS book_count FROM book_writer JOIN writer ON book_writer.writer_id = writer.id GROUP BY book_writer.writer_id  HAVING book_count < (SELECT MAX(book_count)  FROM (SELECT COUNT(*) AS book_count  FROM book_writer  GROUP BY writer_id) AS subquery)-5  ORDER BY book_count DESC;")
+      query1_7= cur.fetchall()
+      cur.close()
+
     if "query2.1" in request.form:
       query = None
       if ("titleCheckbox") in request.form:
@@ -157,8 +164,8 @@ def run_query():
         cur.close()
 
     return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
-                           q2_category=category, query1_3=query3, query1_5=query1_5, categories=session["categories"], 
-                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
+                           q2_category=category, query1_3=query3, query1_5=query1_5, query1_7=query1_7,
+                           categories=session["categories"], query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
                            school_users=session["school_users"], user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])

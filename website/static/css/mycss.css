@@ -112,5 +112,11 @@
   padding-bottom: 5px;
   border-bottom: 1px solid #cfcece;
   background-color:#f3f4f7;
+  border-radius: 4px;
   width: 50%;
+}
+
+.scrollbox {
+  height: 400px;
+  overflow-y: auto;
 }
