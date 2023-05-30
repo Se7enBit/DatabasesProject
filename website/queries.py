@@ -84,7 +84,7 @@ def run_query():
       query = None
       year = request.form.get("year")
       if year == "": year = 0
-      query = f"SELECT au.username AS school_admin_username, COUNT(*) AS book_count FROM school s JOIN app_user au ON au.school = s.id JOIN book_copies_per_school bcps ON bcps.school_id = s.id JOIN book_rental br ON br.book_copy_id = bcps.id WHERE br.rental_status = 'rented' AND YEAR(br.rental_datetime) = {year} AND au.user_role = 'school_admin' GROUP BY au.username HAVING COUNT(*) > 20; "
+      query = f"SELECT au.username AS school_admin_username, COUNT(*) AS book_count FROM school s JOIN app_user au ON au.school = s.id JOIN book_copies_per_school bcps ON bcps.school_id = s.id JOIN book_rental br ON br.book_copy_id = bcps.id WHERE br.rental_status IN ('rented', 'returned', 'late to return') AND YEAR(br.rental_datetime) = {year} AND au.user_role = 'school_admin' GROUP BY au.username HAVING COUNT(*) > 20; "
       cur = db.connection.cursor()
       cur.execute(query)
       rentals = cur.fetchall()
@@ -101,7 +101,10 @@ def run_query():
           pairs[num_rents] = [username]
       for num_rents in pairs:
         if len(pairs[num_rents])>1: query1_5[num_rents]=pairs[num_rents]
-      if query1_5 == {}: query1_5["note that the number of rentals must be greater than 20"]=["No","pairs","found"]
+      if query1_5 == {}: 
+        query1_5["so instead we give you the rentals of each School Admin"]=["No","pairs","found"]#query1_5["note that the number of rentals must be greater than 20"]=["No","pairs","found"]
+        for username, num_rents in rentals:
+          query1_5[num_rents] = [username]
 
     if "query1.7" in request.form:
       cur = db.connection.cursor()

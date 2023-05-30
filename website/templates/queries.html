@@ -170,10 +170,12 @@
         />
       </label>
       {% if query1_5 %}
-      <p>Pairs found:</p>
-      {% for pair in query1_5 %}
-      <p>{% for sa in query1_5[pair] %}{{sa}} {% endfor %} ({{pair}})</p>
-      {% endfor %}
+      <div class="scrollbox">
+        <p>Pairs found:</p>
+        {% for pair in query1_5 %}
+        <p>{% for sa in query1_5[pair] %}{{sa}} {% endfor %} ({{pair}})</p>
+        {% endfor %}
+      </div>
       {% endif %}
     </div>
   </form>
