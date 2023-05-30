@@ -61,3 +61,13 @@ SELECT AVG(rating) FROM book_rating JOIN app_user
 SELECT AVG(book_rating.rating) FROM book_rating JOIN book 
     ON book_rating.book_id = book.id
     WHERE book.category = "art";
+
+--3.1.7 (draft)
+SELECT writer.first_name, writer.last_name, COUNT(*) AS book_count
+FROM book_writer JOIN writer ON book_writer.writer_id = writer.id
+GROUP BY book_writer.writer_id 
+HAVING book_count < (SELECT MAX(book_count) 
+                    FROM (SELECT COUNT(*) AS book_count 
+                            FROM book_writer 
+                            GROUP BY writer_id) AS subquery)-5 
+ORDER BY book_count DESC;
