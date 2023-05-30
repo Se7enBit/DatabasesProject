@@ -25,9 +25,9 @@
     <title>ADMIN</title>
   </head>
   <body>
-    <h1>Admin Page</h1>
-    {% endif %} {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %} {% for category, message in messages %} {% if category ==
+    <h1 align="center">Admin Page</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %} {% if category ==
     'error' %}
     <div
       class="alert alert-danger alert-dismissible fade show"
@@ -58,7 +58,177 @@
     </div>
     {% endif %} {% endfor %} {% endif %} {% endwith %}
 
-    <div class="container">{% block content %} {% endblock %}</div>
+    <div class="container">
+      <form
+        method="POST"
+        action="/admin"
+      >
+        <h3 align="center">Insert School</h3>
+        <div class="form-group">
+          <label for="school_apellation">School Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="school_apellation"
+            name="school_apellation"
+            placeholder="Enter School name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input
+            type="text"
+            class="form-control"
+            id="city"
+            name="city"
+            placeholder="Enter city"
+          />
+        </div>
+        <div class="form-group">
+          <label for="postcode">Postcode</label>
+          <input
+            type="number"
+            class="form-control"
+            id="postcode"
+            name="postcode"
+            placeholder="Enter postcode"
+          />
+        </div>
+        <div class="form-group">
+          <label for="phone_number">Phone Number</label>
+          <input
+            type="number"
+            class="form-control"
+            id="phone_number"
+            name="phone_number"
+            placeholder="Enter phone number"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="text"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Enter email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="principal">Principal</label>
+          <input
+            type="text"
+            class="form-control"
+            id="principal"
+            name="principal"
+            placeholder="Enter principal name"
+          />
+        </div>
+        <h3 align="center">Insert Librarian</h3>
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="first_name"
+            name="first_name"
+            placeholder="Enter first name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="last_name"
+            name="last_name"
+            placeholder="Enter last name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="birthdate">Birthdate</label>
+          <input
+            type="date"
+            class="form-control"
+            id="birthdate"
+            name="birthdate"
+            placeholder="Enter birthdate"
+          />
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="username"
+            class="form-control"
+            id="username"
+            name="username"
+            placeholder="Enter username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password1">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password1"
+            name="password1"
+            placeholder="Enter password"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password2">Password (Confirm)</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password2"
+            name="password2"
+            placeholder="Confirm password"
+          />
+        </div>
+        <br />
+        <div align="center">
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("postcode")
+        .addEventListener("input", function () {
+          var value = parseInt(this.value);
+          if (isNaN(value) || value < 0) {
+            this.setCustomValidity(
+              "Please enter a positive integer for postcode."
+            );
+          } else if (value < 10000 || value >= 100000) {
+            this.setCustomValidity("Postal code should be 5 digits long.");
+          } else {
+            this.setCustomValidity("");
+          }
+        });
+    </script>
+    <script>
+      document
+        .getElementById("phone_number")
+        .addEventListener("input", function () {
+          var value = parseInt(this.value);
+          if (isNaN(value) || value < 0) {
+            this.setCustomValidity(
+              "Please enter a positive integer for phone number."
+            );
+          } else if (value < 1000000000 || value >= 10000000000) {
+            this.setCustomValidity("Phone number should be 10 digits long.");
+          } else {
+            this.setCustomValidity("");
+          }
+        });
+    </script>
 
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

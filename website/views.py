@@ -338,4 +338,68 @@ def profile():
 def admin():
     if current_user.get_id() != 1:
         return redirect(url_for('views.login'))
+    if request.method == "POST":
+        school_name = request.form.get("school_apellation")
+        city = request.form.get("city")
+        postcode = request.form.get("postcode")
+        phone_number = request.form.get("phone_number")
+        email = request.form.get("email")
+        principal = request.form.get("principal")
+
+        if not (school_name and city and postcode and phone_number and email and principal):
+            flash("Please fill in all the fields.", category="error")
+            return redirect(url_for('views.admin'))
+        cur = db.connection.cursor()
+        try:
+            cur.execute("INSERT INTO school (appellation, city, postcode, phone_number, email, principal) VALUES (%s, %s, %s, %s, %s, %s)",
+                (school_name, city, postcode, phone_number, email, principal),)
+            db.connection.commit()
+            flash("School inserted succesfully.", category="success")
+            cur.close()
+        except db.connection.IntegrityError:
+            db.connection.rollback()
+            flash("Invalid inputs.", category="error")
+            cur.close()
+            return redirect(url_for('views.admin'))
+
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT id from school WHERE appellation = '{school_name}'")
+        school_id = cur.fetchone()
+        cur.close()
+
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        birthdate = request.form.get("birthdate")
+        username = request.form.get("username")
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
+        is_active = 1
+        user_role = 'school_admin'
+
+
+        cur = db.connection.cursor()
+        cur.execute("SELECT * FROM app_user WHERE username = %s", [username])
+        app_user = cur.fetchone()
+        cur.close()
+
+        if app_user:
+            flash("Username already exists.", category="error")
+        if len(username) < 4:
+            flash("Username must be greater than 3 characters.", category="error")
+        elif password1 != password2:
+            flash("Passwords don't match.", category="error")
+        elif len(password1) < 7:
+            flash("Password must be at least 7 characters", category="error")
+        else:
+            # add user to database
+            cur = db.connection.cursor()
+            cur.execute(
+                "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, is_active, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, %s, md5(%s))",
+                (first_name, last_name, birthdate, school_id, user_role, is_active, username, password1),
+            )
+            db.connection.commit()
+            cur.close()
+
+        flash("School and its librarian added succesfully.", category="success")
+
     return render_template("admin.html", user = current_user)
