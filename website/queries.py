@@ -12,6 +12,7 @@ def run_query():
   query1 = None
   query2 = None
   query2help = None
+  query1_5 = None
   query2_3 = None
   category = None
   query3 = None
@@ -78,6 +79,29 @@ def run_query():
       query3= cur.fetchall()
       cur.close()
 
+    if "query1.5" in request.form:
+      query = None
+      year = request.form.get("year")
+      if year == "": year = 0
+      query = f"SELECT au.username AS school_admin_username, COUNT(*) AS book_count FROM school s JOIN app_user au ON au.school = s.id JOIN book_copies_per_school bcps ON bcps.school_id = s.id JOIN book_rental br ON br.book_copy_id = bcps.id WHERE br.rental_status = 'rented' AND YEAR(br.rental_datetime) = {year} AND au.user_role = 'school_admin' GROUP BY au.username HAVING COUNT(*) > 20; "
+      cur = db.connection.cursor()
+      cur.execute(query)
+      rentals = cur.fetchall()
+      cur.close()
+      query1_5=rentals
+
+      #Get pairs with equal number of rentals
+      pairs = {}
+      query1_5 = {}
+      for username, num_rents in rentals:
+        if num_rents in pairs:
+          pairs[num_rents].append(username)
+        else:
+          pairs[num_rents] = [username]
+      for num_rents in pairs:
+        if len(pairs[num_rents])>1: query1_5[num_rents]=pairs[num_rents]
+      if query1_5 == {}: query1_5["note that the number of rentals must be greater than 20"]=["No","pairs","found"]
+
     if "query2.1" in request.form:
       query = None
       if ("titleCheckbox") in request.form:
@@ -133,7 +157,7 @@ def run_query():
         cur.close()
 
     return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
-                           q2_category=category, query1_3= query3, categories=session["categories"], 
+                           q2_category=category, query1_3=query3, query1_5=query1_5, categories=session["categories"], 
                            query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
                            school_users=session["school_users"], user=current_user, role=session["user_role"])
   

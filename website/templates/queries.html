@@ -338,7 +338,42 @@
       {% if query2_3 %}
         <p>{{query2_3[1]}} <b>Average Rating: </b>{{query2_3[0]}}</p>
       {% endif %}
+    </div>
   </form>
+  
+  <!-- Equal number of Rentals -->
+  <form
+    action = "/run-query"
+    method = "post"
+  >
+    <div class="form-group">
+      <button
+      type="submit"
+      name="query1.5"
+      class="btn btn-primary"
+      >
+        School Admins with equal number of rentals
+      </button>
+      <p></p>
+      <label for="year">
+        Year:
+        <input
+          id="year"
+          type="number"
+          name="year"
+          min="1950"
+          max="2025"
+        />
+      </label>
+      {% if query1_5 %}
+      <p>Pairs found:</p>
+      {% for pair in query1_5 %}
+      <p>{% for sa in query1_5[pair] %}{{sa}} {% endfor %} ({{pair}})</p>
+      {% endfor %}
+      {% endif %}
+    </div>
+  </form>
+
 </div>
 <script>
   document.getElementById("copiesInput").addEventListener("input", function () {
