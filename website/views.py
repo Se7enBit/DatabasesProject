@@ -142,9 +142,10 @@ def book_page(book_id):
         #Get book writer
         cur = db.connection.cursor()
         cur.execute(f"SELECT first_name, last_name FROM writer JOIN book_writer ON writer.id=book_writer.writer_id WHERE book_writer.book_id={book_id}")
-        writer_full = cur.fetchone()
+        writer_full = cur.fetchall()
         cur.close()
-        writer = writer_full[0]+" "+writer_full[1]
+        writer_list = [w_f[0]+" "+w_f[1] for w_f in writer_full]
+        writer = ", ".join(writer_list)
 
         #Get copies and available copies
         cur = db.connection.cursor()
@@ -187,7 +188,6 @@ def book_page(book_id):
                                num_pages=book_info[4], categories=book_info[5], abstract=book_info[6],
                                language=book_info[7], image_url=image_url, keywords=book_info[9], writer=writer,
                                available=available, rating=average_rating, comments=ratings, num_comments=len(ratings), role=session["user_role"])
-
 
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
@@ -264,7 +264,6 @@ def publish_rating():
         flash("Rating published succesfully", category="success")
 
     return redirect(url_for("views.school_admin"))
-
 
 @views.route("/profile", methods=["GET", "POST"])
 @login_required
