@@ -100,6 +100,10 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     session.clear()
+    if current_user.is_authenticated:
+        if current_user.get_id() == 1:
+            return redirect(url_for('views.admin'))
+        return redirect(url_for("views.home"))
     cur = db.connection.cursor()
     cur.execute("SELECT * FROM school")
     schools = cur.fetchall()
