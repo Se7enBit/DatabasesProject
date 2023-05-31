@@ -13,77 +13,92 @@ views = Blueprint("views", __name__)
 def home():
     if current_user.is_anonymous:
         return render_template("login.html")
-    else:
-        if current_user.get_id() == 1:
-            return redirect(url_for("views.admin"))
+    
+    #Get data for session (normally this should happen immediatly after login)
+    ###################################################
+    cur= db.connection.cursor()
+    cur.execute("SELECT DISTINCT category FROM book;")
+    results = cur.fetchall()
+    cur.close()
+    cats = set()
+    for result in results:
+        category_set = set(result[0].split(','))
+        cats.update(category_set)
+    categories = sorted(cats)
+    session["categories"] = categories
+    ##################################################
+
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
+    
+    cur = db.connection.cursor()
+    id=current_user.get_id()
+    cur.execute(f"SELECT s.id AS school_id, s.appellation AS school_appellation, au.user_role AS user_role FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = {id};")
+    info = cur.fetchone()
+    cur.close()
+    session["school_id"]= info[0]
+    session["school_name"]= info[1] 
+    session["user_role"]= info[2]
+    
+    #Here you can add any data that you want to pass to the home page
+    data={}
+    img_for_returned = None
+    img_for_rented = None
+
+    #STUDENT AND TEACHER
+    if session["user_role"] in ["student", "teacher"]:
         cur = db.connection.cursor()
-        id=current_user.get_id()
-        cur.execute(f"SELECT s.id AS school_id, s.appellation AS school_appellation, au.user_role AS user_role FROM app_user AS au JOIN school AS s ON au.school = s.id WHERE au.id = {id};")
-        info = cur.fetchone()
+        cur.execute(f"""select book.*, book_rental.request_datetime, book_rental.rental_datetime, book_rental.return_datetime, book_rental.rental_status
+                    from book join book_rental ON book.id = book_rental.book_id
+                    where book_rental.app_user_id = {id} and book_rental.rental_status in ("reservation", "rented", "late to return", "returned");""")
+        rented_books = cur.fetchall()
         cur.close()
-        session["school_id"]= info[0]
-        session["school_name"]= info[1] 
-        session["user_role"]= info[2]
+        img_for_rented=[]
+        img_for_returned=[]
+        ids_rented =[]
+        ids_returned=[]
+        i=0
+        j=0
+        #[13] gives the status
+        for rented_book in rented_books:
+            if rented_book[13] == "rented":
+                ids_rented.append(rented_book[0]-1)
+                img_for_rented.append(url_for('static', filename=f'images/{ids_rented[i]}.png'))
+                i = i+1
+            elif rented_book[13] == "returned":
+                ids_returned.append(rented_book[0]-1)
+                img_for_returned.append(url_for('static', filename=f'images/{ids_returned[j]}.png'))
+                j=j+1
         
-        #Here you can add any data that you want to pass to the home page
-        data={}
-        img_for_returned = None
-        img_for_rented = None
+        #doesnt work cause after that mike 
 
-        #STUDENT AND TEACHER
-        if session["user_role"] in ["student", "teacher"]:
-            cur = db.connection.cursor()
-            cur.execute(f"""select book.*, book_rental.request_datetime, book_rental.rental_datetime, book_rental.return_datetime, book_rental.rental_status
-                        from book join book_rental ON book.id = book_rental.book_id
-                        where book_rental.app_user_id = {id} and book_rental.rental_status in ("reservation", "rented", "late to return", "returned");""")
-            rented_books = cur.fetchall()
-            cur.close()
-            img_for_rented=[]
-            img_for_returned=[]
-            ids_rented =[]
-            ids_returned=[]
-            i=0
-            j=0
-            #[13] gives the status
-            for rented_book in rented_books:
-                if rented_book[13] == "rented":
-                    ids_rented.append(rented_book[0]-1)
-                    img_for_rented.append(url_for('static', filename=f'images/{ids_rented[i]}.png'))
-                    i = i+1
-                elif rented_book[13] == "returned":
-                    ids_returned.append(rented_book[0]-1)
-                    img_for_returned.append(url_for('static', filename=f'images/{ids_returned[j]}.png'))
-                    j=j+1
-            
-            #doesnt work cause after that mike 
+        data["rented"] = [book for book in rented_books if book[-1] in ["reservation", "rented", "late to return"]]
+        data["returned"] = [book for book in rented_books if book[-1] == "returned"]
+        data["num_rented"] = len(data["rented"])
+        data["num_returned"] = len(data["returned"])
+        
+        #!Use the data dictionary to pass any data to home page
+        return render_template("home.html", user = current_user, role=session["user_role"], data=data, img_for_returned=img_for_returned, img_for_rented=img_for_rented)
 
-            data["rented"] = [book for book in rented_books if book[-1] in ["reservation", "rented", "late to return"]]
-            data["returned"] = [book for book in rented_books if book[-1] == "returned"]
-            data["num_rented"] = len(data["rented"])
-            data["num_returned"] = len(data["returned"])
-            
-            #!Use the data dictionary to pass any data to home page
-            return render_template("home.html", user = current_user, role=session["user_role"], data=data, img_for_returned=img_for_returned, img_for_rented=img_for_rented)
+    #SCHOOL ADMIN
+    elif session["user_role"] == "school_admin":
+        school=session["school_name"]
+        school_id=session["school_id"]
+        inactive_users = None
+        unpublished_ratings = None
 
-        #SCHOOL ADMIN
-        elif session["user_role"] == "school_admin":
-            school=session["school_name"]
-            school_id=session["school_id"]
-            inactive_users = None
-            unpublished_ratings = None
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0 AND user_role IN ('student', 'teacher');")
+        inactive_users= cur.fetchall()
+        cur.close()
 
-            cur = db.connection.cursor()
-            cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0 AND user_role IN ('student', 'teacher');")
-            inactive_users= cur.fetchall()
-            cur.close()
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
+        unpublished_ratings= cur.fetchall()
+        cur.close()
+        print(unpublished_ratings)
 
-            cur = db.connection.cursor()
-            cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
-            unpublished_ratings= cur.fetchall()
-            cur.close()
-            print(unpublished_ratings)
-
-            return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
+        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
 
 @views.route("/books", methods=["GET", "POST"])
 @login_required
@@ -207,17 +222,6 @@ def book_page(book_id):
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
 def queries():
-    cur= db.connection.cursor()
-    cur.execute("SELECT DISTINCT category FROM book;")
-    results = cur.fetchall()
-    cur.close()
-    cats = set()
-    for result in results:
-        category_set = set(result[0].split(','))
-        cats.update(category_set)
-    categories = sorted(cats)
-    session["categories"] = categories
-
     #Get School users
     cur = db.connection.cursor()
     cur.execute(f"""SELECT id, username FROM app_user WHERE school="{session['school_id']}" ORDER BY username;""")
