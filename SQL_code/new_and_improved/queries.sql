@@ -46,6 +46,19 @@ FROM app_user
     JOIN book_rental ON book_rental.app_user_id = app_user.id
 WHERE book_rental.rental_status = "late to return";
 
+-- Search book info by writer
+SELECT b.title, COUNT(bcps.id) AS copy_count, b.image, b.id 
+FROM app_user AS au 
+JOIN school AS s ON au.school = s.id 
+JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id 
+JOIN book AS b ON bcps.book_id = b.id 
+JOIN book_writer bw ON bw.book_id = b.id
+JOIN writer w ON bw.writer_id=w.id
+WHERE au.id = {user_id}
+AND w.first_name LIKE "%ONOMA%"
+OR w.last_name LIKE "%EPONIMO%"
+GROUP BY b.title
+
 --3.1.2 (first part)
 SELECT writer.* FROM writer JOIN book_writer
     -> ON writer.id = book_writer.writer_id

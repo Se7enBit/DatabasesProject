@@ -5,6 +5,42 @@
   <span style="color: darkblue">{{school}} Library</span>
 </h1>
 <br />
+<!-- Search Bar -->
+<form class="form-group" action="/books" method="post">
+  <h6>Search by:</h6>
+  <label>
+    <input type="radio" name="search-option" value="titleCheckbox" onchange="searchOptions()"/>
+    Book Title
+  </label>
+  <label>
+    <input type="radio" name="search-option" value="categoryCheckbox" onchange="searchOptions()"/>
+    Category
+  </label>
+  <label>
+    <input type="radio" name="search-option" value="writerCheckbox" onchange="searchOptions()"/>
+    Writer
+  </label>
+
+  <div style="display:flex;">
+    <input type="text" id="titleInput" name="book_title"
+      style="display: none; flex-grow:1;" placeholder="Enter a book title"/>
+
+    <select id="categoryInput" name="category" style="display: none;">
+      {% for category in categories %}
+      <option value="{{category}}">{{category}}</option>
+      {% endfor %}
+    </select>  
+
+    <input type="text" id="writerInput" name="book_writer"
+      style="display: none; flex-grow:1" placeholder="Enter a writer name"/>
+
+    <button type="submit" id="search" style="display:none; margin-left:auto" class="btn btn-primary">
+      Search
+    </button>
+  </div>
+</form>
+
+<!-- Books List -->
 <ul>
   {% for row in rows %}
   <li class="product">
@@ -22,4 +58,8 @@
   </li>
   {% endfor %}
 </ul>
+
+<script>
+
+</script>
 {% endblock %}

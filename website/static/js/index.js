@@ -100,3 +100,32 @@ function toggleInputs3() {
     categoryInput.style.display = 'none';
   }
 }
+
+function searchOptions() {
+  const titleCheckbox = document.querySelector('input[value="titleCheckbox"]');
+  const categoryCheckbox = document.querySelector('input[value="categoryCheckbox"]');
+  const writerCheckbox = document.querySelector('input[value="writerCheckbox"]');
+  const tilteInput = document.getElementById('titleInput');
+  const categoryInput = document.getElementById('categoryInput');
+  const writerInput = document.getElementById('writerInput');
+  const search = document.getElementById('search');
+
+  if(titleCheckbox.checked) {
+    titleInput.style.display = 'block';
+    categoryInput.style.display = 'none';
+    writerInput.style.display = 'none';
+    search.style.display = 'block';
+  }
+  else if(categoryCheckbox.checked) {
+    titleInput.style.display = 'none';
+    categoryInput.style.display = 'block';
+    writerInput.style.display = 'none';
+    search.style.display = 'block';
+  }
+  else if(writerCheckbox.checked) {
+    titleInput.style.display = 'none';
+    categoryInput.style.display = 'none';
+    writerInput.style.display = 'block';
+    search.style.display = 'block';
+  }
+}
