@@ -1,5 +1,12 @@
-{% extends "base.html" %}{% block title %}School Admin Page{% endblock %} {%
-block content %}
+{% extends "base.html" %}{% block title %}School Admin Page{% endblock %}{%
+block navbar %} {% if role == 'school_admin'%}
+<a
+  class="nav-link"
+  id="queries"
+  href="/queries"
+  >Advanced Tools</a
+>
+{% endif %} {% endblock %}{% block content %}
 <h1 align="center">{{school}} Admin Page</h1>
 <!-- Inactive Users -->
 <div class="container">
@@ -9,7 +16,7 @@ block content %}
     </h6>
     <ul>
       {% for user in users %}
-      <li  class="section-item">
+      <li class="section-item">
         {{user[1]}} {{user[2]}} , role: {{user[5]}}
         <form
           action="/set-active"
@@ -41,11 +48,14 @@ block content %}
     </h6>
     <ul>
       {% for rating in ratings %}
-      <li  class="section-item">
-      <b>For: </b>{{rating[1]}}<b> From: </b>{{rating[2]}} <b>Rating: </b>{{rating[3]}}<br>
-      <b>Comment: </b>{{rating[4]}}<br>
+      <li class="section-item">
+        <b>For: </b>{{rating[1]}}<b> From: </b>{{rating[2]}}
+        <b>Rating: </b>{{rating[3]}}<br />
+        <b>Comment: </b>{{rating[4]}}<br />
         <form
-          action="/publish-rating"list-style-type: none;
+          action="/publish-rating"
+          list-style-type:
+          none;
           method="POST"
           style="display: inline"
         >
@@ -74,11 +84,11 @@ block content %}
     </h6>
     <ul>
       {% for user in late %}
-        <li class="section-item">
-          <b>{{user[1]}} {{user[2]}}</b><br>
-          book copy id: {{user[3]}}<br>
-          days late: {{user[4]}}
-        </li>
+      <li class="section-item">
+        <b>{{user[1]}} {{user[2]}}</b><br />
+        book copy id: {{user[3]}}<br />
+        days late: {{user[4]}}
+      </li>
       {% endfor %}
     </ul>
   </div>

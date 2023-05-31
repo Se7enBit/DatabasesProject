@@ -211,6 +211,8 @@ def book_page(book_id):
 def queries():
     if current_user.get_id() == 1:
         return redirect(url_for("views.admin"))
+    if session["user_role"] != "school_admin":
+        return redirect(url_for("views.home"))
     cur= db.connection.cursor()
     cur.execute("SELECT DISTINCT category FROM book;")
     results = cur.fetchall()
@@ -232,6 +234,24 @@ def queries():
     
     return render_template("queries.html", user=current_user, role=session["user_role"], 
                            categories=categories, school_users=session["school_users"])
+
+@views.route("/queries-admin", methods=["GET", "POST"])
+@login_required
+def queries_admin():
+    if current_user.get_id() != 1:
+        return redirect(url_for("views.home"))
+    cur= db.connection.cursor()
+    cur.execute("SELECT DISTINCT category FROM book;")
+    results = cur.fetchall()
+    cur.close()
+    cats = set()
+    for result in results:
+        category_set = set(result[0].split(','))
+        cats.update(category_set)
+    categories = sorted(cats)
+    session["categories"] = categories
+    
+    return render_template("queries_admin.html", user=current_user, categories=categories)
 
 @views.route("/school-admin", methods=["GET", "POST"])
 @login_required

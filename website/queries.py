@@ -4,11 +4,79 @@ from . import db, app
 from SQL_code.rental_package import book_renter as br
 import mysql.connector, os, datetime
 
-queries = Blueprint("queries", __name__)
+queries = Blueprint("queries", __name__) 
 
 @queries.route("/run-query", methods=["POST"])
 @login_required
 def run_query():
+  if session["user_role"] != "school_admin":
+    return redirect(url_for("views.home"))
+  query2_3 = None
+  category = None
+  query4 = None
+  query2_1help = None
+
+  if request.method == "POST":
+    if "query2.1" in request.form:
+      query = None
+      if ("titleCheckbox") in request.form:
+        title = request.form.get("title")
+        if title:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE book.title LIKE '%{title}%';"
+      elif ("categoryCheckbox") in request.form:
+        category = request.form.get("category")
+        if category:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE FIND_IN_SET('{category}', category);"
+      elif ("writerCheckbox") in request.form:
+        writer = request.form.get("writer")
+        if writer:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE writer.last_name LIKE '%{writer}%' OR writer.first_name LIKE '%{writer}%';"
+      elif ("copiesCheckbox") in request.form:
+        copies = request.form.get("copies")
+        if copies:
+          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
+
+      if query:
+        cur = db.connection.cursor()
+        cur.execute(query)
+        query4 = cur.fetchall()
+        cur.close()
+        query2_1help = []
+        ids=[]
+        for index, book in enumerate(query4):
+          ids.append(book[2]-1)         
+          query2_1help.append(url_for('static', filename=f'images/{ids[index]}.png'))
+
+    if "query2.3" in request.form:
+      query=None
+      criteria=None
+      if ("userCheckbox") in request.form:
+        user = request.form.get("user")
+        criteria = next((usr[1] for usr in session["school_users"] if usr[0]==int(user)), None)
+        if user:
+          query = f"SELECT AVG(rating) FROM book_rating JOIN app_user ON book_rating.app_user_id = app_user.id WHERE app_user.id={user};"
+      elif ("categoryCheckbox2") in request.form:
+        category = request.form.get("category")
+        criteria = category
+        if category:
+          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE book.category = '{category}';"""
+      
+      if query:
+        query2_3=['','']
+        cur = db.connection.cursor()
+        cur.execute(query)
+        query2_3[0] = cur.fetchone()[0]
+        if query2_3[0] == None: query2_3[0] = '-'
+        query2_3[1] = criteria
+        cur.close()
+
+  return render_template("queries.html",categories=session["categories"],
+                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
+                           school_users=session["school_users"], user=current_user, role=session["user_role"])
+
+@queries.route("/run-query-admin", methods=["POST"])
+@login_required
+def run_query_admin():
   query1 = None
   query2 = None
   query2help = None
@@ -16,11 +84,8 @@ def run_query():
   query1_5 = None
   query1_6 = None
   query1_7 = None
-  query2_3 = None
   category = None
   query3 = None
-  query4 = None
-  query2_1help = None
   queryHelp = None
 
   if request.method == "POST":
@@ -137,65 +202,11 @@ def run_query():
       query1_7= cur.fetchall()
       cur.close()
 
-    if "query2.1" in request.form:
-      query = None
-      if ("titleCheckbox") in request.form:
-        title = request.form.get("title")
-        if title:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE book.title LIKE '%{title}%';"
-      elif ("categoryCheckbox") in request.form:
-        category = request.form.get("category")
-        if category:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE FIND_IN_SET('{category}', category);"
-      elif ("writerCheckbox") in request.form:
-        writer = request.form.get("writer")
-        if writer:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE writer.last_name LIKE '%{writer}%' OR writer.first_name LIKE '%{writer}%';"
-      elif ("copiesCheckbox") in request.form:
-        copies = request.form.get("copies")
-        if copies:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
-
-      if query:
-        cur = db.connection.cursor()
-        cur.execute(query)
-        query4 = cur.fetchall()
-        cur.close()
-        query2_1help = []
-        ids=[]
-        for index, book in enumerate(query4):
-          ids.append(book[2]-1)         
-          query2_1help.append(url_for('static', filename=f'images/{ids[index]}.png'))
-
-    if "query2.3" in request.form:
-      query=None
-      criteria=None
-      if ("userCheckbox") in request.form:
-        user = request.form.get("user")
-        criteria = next((usr[1] for usr in session["school_users"] if usr[0]==int(user)), None)
-        if user:
-          query = f"SELECT AVG(rating) FROM book_rating JOIN app_user ON book_rating.app_user_id = app_user.id WHERE app_user.id={user};"
-      elif ("categoryCheckbox2") in request.form:
-        category = request.form.get("category")
-        criteria = category
-        if category:
-          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE book.category = '{category}';"""
-      
-      if query:
-        query2_3=['','']
-        cur = db.connection.cursor()
-        cur.execute(query)
-        query2_3[0] = cur.fetchone()[0]
-        if query2_3[0] == None: query2_3[0] = '-'
-        query2_3[1] = criteria
-        cur.close()
-
-    return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
+  return render_template("queries_admin.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
                            q2_category=category, query1_3=query3, query1_4=query1_4, query1_5=query1_5,
                            query1_6=query1_6, query1_7=query1_7,categories=session["categories"],
-                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3, queryHelp=queryHelp,
-                           school_users=session["school_users"], user=current_user, role=session["user_role"])
-  
+                           queryHelp=queryHelp, user=current_user, role=session["user_role"])
+
 @queries.route("/rent-book", methods=["POST"])
 @login_required
 def rent_book():

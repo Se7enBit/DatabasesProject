@@ -1,40 +1,85 @@
-{% extends "base.html" %}{% block title %}Books{% endblock %} {% block content
-%}
+{% extends "base.html" %}{% block title %}Books{% endblock %}{% block navbar %}
+{% if role == 'school_admin'%}
+<a
+  class="nav-link"
+  id="queries"
+  href="/queries"
+  >Advanced Tools</a
+>
+{% endif %}{% endblock %} {% block content %}
 <h1 align="center">
   List of books in
   <span style="color: darkblue">{{school}} Library</span>
 </h1>
 <br />
 <!-- Search Bar -->
-<form class="form-group" action="/books" method="post">
+<form
+  class="form-group"
+  action="/books"
+  method="post"
+>
   <h6>Search by:</h6>
   <label>
-    <input type="radio" name="search-option" value="titleCheckbox" onchange="searchOptions()"/>
+    <input
+      type="radio"
+      name="search-option"
+      value="titleCheckbox"
+      onchange="searchOptions()"
+    />
     Book Title
   </label>
   <label>
-    <input type="radio" name="search-option" value="categoryCheckbox" onchange="searchOptions()"/>
+    <input
+      type="radio"
+      name="search-option"
+      value="categoryCheckbox"
+      onchange="searchOptions()"
+    />
     Category
   </label>
   <label>
-    <input type="radio" name="search-option" value="writerCheckbox" onchange="searchOptions()"/>
+    <input
+      type="radio"
+      name="search-option"
+      value="writerCheckbox"
+      onchange="searchOptions()"
+    />
     Writer
   </label>
 
-  <div style="display:flex;">
-    <input type="text" id="titleInput" name="book_title"
-      style="display: none; flex-grow:1;" placeholder="Enter a book title"/>
+  <div style="display: flex">
+    <input
+      type="text"
+      id="titleInput"
+      name="book_title"
+      style="display: none; flex-grow: 1"
+      placeholder="Enter a book title"
+    />
 
-    <select id="categoryInput" name="category" style="display: none;">
+    <select
+      id="categoryInput"
+      name="category"
+      style="display: none"
+    >
       {% for category in categories %}
       <option value="{{category}}">{{category}}</option>
       {% endfor %}
-    </select>  
+    </select>
 
-    <input type="text" id="writerInput" name="book_writer"
-      style="display: none; flex-grow:1" placeholder="Enter a writer name"/>
+    <input
+      type="text"
+      id="writerInput"
+      name="book_writer"
+      style="display: none; flex-grow: 1"
+      placeholder="Enter a writer name"
+    />
 
-    <button type="submit" id="search" style="display:none; margin-left:auto" class="btn btn-primary">
+    <button
+      type="submit"
+      id="search"
+      style="display: none; margin-left: auto"
+      class="btn btn-primary"
+    >
       Search
     </button>
   </div>
@@ -59,7 +104,5 @@
   {% endfor %}
 </ul>
 
-<script>
-
-</script>
+<script></script>
 {% endblock %}

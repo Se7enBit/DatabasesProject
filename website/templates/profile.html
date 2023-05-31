@@ -1,5 +1,12 @@
-{% extends "base.html" %}{% block title %}Profile{% endblock %} {% block content
-%}
+{% extends "base.html" %}{% block title %}Profile{% endblock %} {% block navbar
+%} {% if role == 'school_admin'%}
+<a
+  class="nav-link"
+  id="queries"
+  href="/queries"
+  >Advanced Tools</a
+>
+{% endif %}{% endblock %}{% block content %}
 <h1 style="padding-top: 10px; color: #2b2020">
   {{info[0]}} {{info[1]}}'s Profile
 </h1>
@@ -20,7 +27,7 @@
       method="POST"
       action="/profile"
     >
-      <div class="form-group">
+      <div class="">
         <label for="name">First Name:</label>
         <input
           type="text"
@@ -42,11 +49,12 @@
         </button>
       </div>
     </form>
+    <br />
     <form
       method="POST"
       action="/profile"
     >
-      <div class="form-group">
+      <div class="">
         <label for="username">Username:</label>
         <input
           type="text"
@@ -62,11 +70,12 @@
         </button>
       </div>
     </form>
+    <br />
     <form
       method="POST"
       action="/profile"
     >
-      <div class="form-group">
+      <div class="">
         <label for="birthdate">Birthdate:</label>
         <input
           type="date"
