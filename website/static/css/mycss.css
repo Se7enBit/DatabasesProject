@@ -120,3 +120,21 @@
   max-height: 400px;
   overflow-y: auto;
 }
+
+/* Librarian Page */
+.page-section{
+  align-items: center;
+  background-color: #d6dee6;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 15px;
+}
+
+.section-item{
+  list-style-type: none;
+  align-items: center;
+  background-color: #e2e8ee;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 15px;
+}

@@ -225,19 +225,26 @@ def school_admin():
         school_id=session["school_id"]
         inactive_users = None
         unpublished_ratings = None
-
+        
+        #Find inactive users
         cur = db.connection.cursor()
         cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0;")
         inactive_users= cur.fetchall()
         cur.close()
 
+        #Find unpublished ratings
         cur = db.connection.cursor()
         cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
         unpublished_ratings= cur.fetchall()
         cur.close()
-        print(unpublished_ratings)
+        
+        #Find late-to-return
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT u.id, u.first_name, u.last_name, br.book_copy_id, DATEDIFF(NOW(), br.rental_datetime)-7 AS days_late FROM app_user u JOIN book_rental br ON u.id = br.app_user_id WHERE u.school = {school_id} AND br.late_to_return = 1;")
+        late = cur.fetchall()
+        cur.close()
 
-        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
+        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"], late=late)
 
 @views.route("/set-active", methods=["POST"])
 @login_required

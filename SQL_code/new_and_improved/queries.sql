@@ -71,10 +71,14 @@ WHERE FIND_IN_SET('art', b.category) > 0
 GROUP BY b.id
 ORDER BY book_rentals DESC
 LIMIT 3;
---draft
-SELECT id, title, category
-FROM book
-WHERE FIND_IN_SET('art', category) > 0 AND FIND_IN_SET('autobiography', category) > 0;
+
+--3.2.2 Users that have at least one late-to-return book
+SELECT u.id, u.first_name, u.last_name, br.book_copy_id, DATEDIFF(NOW(), br.rental_datetime)-7 AS days_late
+FROM app_user u
+JOIN book_rental br ON u.id = br.app_user_id
+WHERE u.school = 1
+AND br.late_to_return = 1;
+
 
 --3.2.3 by user
 SELECT AVG(rating) FROM book_rating JOIN app_user

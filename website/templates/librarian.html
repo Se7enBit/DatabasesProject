@@ -1,14 +1,15 @@
 {% extends "base.html" %}{% block title %}School Admin Page{% endblock %} {%
 block content %}
 <h1 align="center">{{school}} Admin Page</h1>
+<!-- Inactive Users -->
 <div class="container">
-  <div class="product">
+  <div class="page-section">
     <h6 style="text-align: left; text-decoration-line: underline">
       Inactive Users
     </h6>
     <ul>
       {% for user in users %}
-      <li class="book-description">
+      <li  class="section-item">
         {{user[1]}} {{user[2]}} , role: {{user[5]}}
         <form
           action="/set-active"
@@ -32,21 +33,19 @@ block content %}
     </ul>
   </div>
 </div>
+<!-- Unpublished Ratings -->
 <div class="container">
-  <div class="product">
+  <div class="page-section">
     <h6 style="text-align: left; text-decoration-line: underline">
       Unpublished Ratings
     </h6>
     <ul>
       {% for rating in ratings %}
-      <li>
-        <pre>
-For: {{rating[1]}} From: {{rating[2]}} Rating: {{rating[3]}}
-Comment: {{rating[4]}}
-      </pre
-        >
+      <li  class="section-item">
+      <b>For: </b>{{rating[1]}}<b> From: </b>{{rating[2]}} <b>Rating: </b>{{rating[3]}}<br>
+      <b>Comment: </b>{{rating[4]}}<br>
         <form
-          action="/publish-rating"
+          action="/publish-rating"list-style-type: none;
           method="POST"
           style="display: inline"
         >
@@ -67,4 +66,22 @@ Comment: {{rating[4]}}
     </ul>
   </div>
 </div>
+<!-- Late to Return -->
+<div class="container">
+  <div class="page-section">
+    <h6 style="text-align: left; text-decoration-line: underline">
+      Late to Return
+    </h6>
+    <ul>
+      {% for user in late %}
+        <li class="section-item">
+          <b>{{user[1]}} {{user[2]}}</b><br>
+          book copy id: {{user[3]}}<br>
+          days late: {{user[4]}}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<p></p>
 {% endblock %}
