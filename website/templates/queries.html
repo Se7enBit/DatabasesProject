@@ -215,7 +215,7 @@
     >
       Category Pairs
     </button>
-    <br>
+    <p></p>
     <span>1st category:</span>
     <select
     id="category1"
@@ -236,7 +236,52 @@
     </select>
     {% if query1_6 %}
       <br>
-      <p>{{query1_6}}</p>
+      <p>Top 3 books in rentals with this pair of categories:</p>
+      <div class="product" style="background-color: gold;">
+        {% if queryHelp[0]>=1 %}
+        <img
+          src="{{queryHelp[1]}}"
+          alt="Book Cover"
+          height = "110"
+          />
+          <div style = "margin:10px; width:90%">
+          <h6><a href="/books/{{query1_6[0][0]}}">{{query1_6[0][1]}}</a></h6>
+          <p><b>categories:</b><br>{{query1_6[0][2]}}</p>
+          </div>
+        {% else %}
+          <p>-</p>
+        {% endif %}
+      </div>
+      <div class="product" style="background-color: silver;">
+      {% if queryHelp[0]>=2 %}
+        <img
+          src="{{queryHelp[2]}}"
+          alt="Book Cover"
+          height = "110"
+          />
+        <div style = "margin:10px; width:90%">
+        <h6><a href="/books/{{query1_6[1][0]}}">{{query1_6[1][1]}}</a></h6>
+        <p><b>categories:</b><br>{{query1_6[1][2]}}</p>
+        </div>
+        {% else %}
+        <p>-</p>
+        {% endif %}
+      </div>
+      <div class="product" style="background-color: rgb(205, 127, 50)">
+      {% if queryHelp[0]>=3%}
+        <img
+          src="{{queryHelp[3]}}"
+          alt="Book Cover"
+          height = "110"
+          />
+        <div style = "margin:10px; width:90%">
+        <h6><a href="/books/{{query1_6[2][0]}}">{{query1_6[2][1]}}</a></h6>
+        <p><b>categories:</b><br>{{query1_6[2][2]}}</p>
+        </div>
+        {% else %}
+        <p>-</p>
+        {% endif %}
+      </div>
     {% endif %}
   </form>
 

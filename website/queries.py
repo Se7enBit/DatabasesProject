@@ -21,6 +21,7 @@ def run_query():
   query3 = None
   query4 = None
   query2_1help = None
+  queryHelp = None
 
   if request.method == "POST":
     if "query1.1" in request.form:
@@ -115,13 +116,20 @@ def run_query():
           query1_5[num_rents] = [username]
 
     if "query1.6" in request.form:
-      query = None
       category1 = request.form.get("category1")
       category2 = request.form.get("category2")
-      #vvv placeholders vvv#
-      print(f"1st category: {category1}")
-      print(f"2nd category: {category2}")
-      query1_6 = "The top 3 books with this pair of categories will appear here"
+      if category1 == category2:
+        query1_6=None
+      else:
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT b.id, b.title, b.category, COUNT(br.id) AS book_rentals FROM book b LEFT JOIN book_rental br ON b.id = br.book_id WHERE FIND_IN_SET('{category1}', b.category) > 0 AND FIND_IN_SET('{category2}', b.category) > 0 GROUP BY b.id ORDER BY book_rentals DESC LIMIT 3;")
+        query1_6 = cur.fetchall()
+        cur.close()
+        queryHelp=[len(query1_6)]
+        for book in query1_6:
+          queryHelp.append(url_for('static', filename=f"images/{book[0]-1}.png"))      
+        print(query1_6)
+        print(queryHelp)
 
     if "query1.7" in request.form:
       cur = db.connection.cursor()
@@ -147,7 +155,6 @@ def run_query():
         copies = request.form.get("copies")
         if copies:
           query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
-
 
       if query:
         cur = db.connection.cursor()
@@ -186,7 +193,7 @@ def run_query():
     return render_template("queries.html", query1_1=query1, query1_2=query2, query1_2help=query2help, 
                            q2_category=category, query1_3=query3, query1_4=query1_4, query1_5=query1_5,
                            query1_6=query1_6, query1_7=query1_7,categories=session["categories"],
-                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3,
+                           query2_1=query4,query2_1help=query2_1help, query2_3=query2_3, queryHelp=queryHelp,
                            school_users=session["school_users"], user=current_user, role=session["user_role"])
   
 @queries.route("/rent-book", methods=["POST"])

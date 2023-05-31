@@ -62,6 +62,20 @@ WHERE NOT EXISTS (
   WHERE bw.writer_id = w.id
 );
 
+--3.1.6 Top 3 books with pair of categories
+SELECT b.id, b.title, b.category, COUNT(br.id) AS book_rentals
+FROM book b
+LEFT JOIN book_rental br ON b.id = br.book_id
+WHERE FIND_IN_SET('art', b.category) > 0
+    AND FIND_IN_SET('autobiography', b.category) > 0
+GROUP BY b.id
+ORDER BY book_rentals DESC
+LIMIT 3;
+--draft
+SELECT id, title, category
+FROM book
+WHERE FIND_IN_SET('art', category) > 0 AND FIND_IN_SET('autobiography', category) > 0;
+
 --3.2.3 by user
 SELECT AVG(rating) FROM book_rating JOIN app_user
     ON book_rating.app_user_id = app_user.id
