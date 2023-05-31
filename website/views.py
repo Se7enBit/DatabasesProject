@@ -231,7 +231,7 @@ def queries():
     cur.close()
     
     return render_template("queries.html", user=current_user, role=session["user_role"], 
-                           categories=categories, school_users=session["school_users"])
+                           categories=session["categories"], school_users=session["school_users"])
 
 @views.route("/school-admin", methods=["GET", "POST"])
 @login_required
