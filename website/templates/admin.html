@@ -1,254 +1,257 @@
-<!DOCTYPE html>
-<html lang="el">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='css/mycss.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      crossorigin="anonymous"
-    />
-    <title>ADMIN</title>
-  </head>
-  <body>
-    <h1 align="center">Admin Page</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %} {% if category ==
-    'error' %}
-    <div
-      class="alert alert-danger alert-dismissible fade show"
-      role="alert"
-    >
-      {{ message }}
+{% extends 'base2.html' %} {% block content %}
+<div class="container">
+  <form
+    method="POST"
+    action="/admin"
+  >
+    <h3 align="center">Insert School</h3>
+    <div class="form-group">
+      <label for="school_apellation">School Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="school_apellation"
+        name="school_apellation"
+        placeholder="Enter School name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="city">City</label>
+      <input
+        type="text"
+        class="form-control"
+        id="city"
+        name="city"
+        placeholder="Enter city"
+      />
+    </div>
+    <div class="form-group">
+      <label for="postcode">Postcode</label>
+      <input
+        type="number"
+        class="form-control"
+        id="postcode"
+        name="postcode"
+        placeholder="Enter postcode"
+      />
+    </div>
+    <div class="form-group">
+      <label for="phone_number">Phone Number</label>
+      <input
+        type="number"
+        class="form-control"
+        id="phone_number"
+        name="phone_number"
+        placeholder="Enter phone number"
+      />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="text"
+        class="form-control"
+        id="email"
+        name="email"
+        placeholder="Enter email"
+      />
+    </div>
+    <div class="form-group">
+      <label for="principal">Principal</label>
+      <input
+        type="text"
+        class="form-control"
+        id="principal"
+        name="principal"
+        placeholder="Enter principal name"
+      />
+    </div>
+    <h3 align="center">Insert Librarian</h3>
+    <div class="form-group">
+      <label for="first_name">First Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="first_name"
+        name="first_name"
+        placeholder="Enter first name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="last_name">Last Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="last_name"
+        name="last_name"
+        placeholder="Enter last name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="birthdate">Birthdate</label>
+      <input
+        type="date"
+        class="form-control"
+        id="birthdate"
+        name="birthdate"
+        placeholder="Enter birthdate"
+      />
+    </div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        type="username"
+        class="form-control"
+        id="username"
+        name="username"
+        placeholder="Enter username"
+      />
+    </div>
+    <div class="form-group">
+      <label for="password1">Password</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password1"
+        name="password1"
+        placeholder="Enter password"
+      />
+    </div>
+    <div class="form-group">
+      <label for="password2">Password (Confirm)</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password2"
+        name="password2"
+        placeholder="Confirm password"
+      />
+    </div>
+    <br />
+    <div align="center">
       <button
-        type="button"
-        class="close"
-        data-dismiss="alert"
+        type="submit"
+        class="btn btn-primary"
+        name="signup-school"
       >
-        <span aria-hidden="true">&times;</span>
+        Submit
       </button>
     </div>
-    {% else %}
-    <div
-      class="alert alert-success alert-dismissible fade show"
-      role="alert"
-    >
-      {{ message }}
-      <button
-        type="button"
-        class="close"
-        data-dismiss="alert"
+  </form>
+</div>
+<br />
+<div class="form-group">
+  <h2>Existing Librarians</h2>
+  <table class="table table-dark table-striped">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>School</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for librarian in librarians %}
+      <tr>
+        <td>{{ librarian[0] }}</td>
+        <td>{{ librarian[1] }}</td>
+        <td>{{ librarian[2] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="modify-info">
+  <h3
+    align="center"
+    class="modify-title"
+  >
+    Modify Information
+  </h3>
+  <form
+    method="POST"
+    action="/admin"
+  >
+    <div class="form-group">
+      <label for="user_role">Librarian's School</label>
+      <select
+        class="form-control"
+        id="school"
+        name="school"
       >
-        <span aria-hidden="true">&times;</span>
+        <option value=""></option>
+        {% for school in schools %}
+        <option value="{{school[0]}}">{{school[1]}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="name">First Name:</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+      /><br />
+      <label for="last-name">Last Name:</label>
+      <input
+        type="text"
+        id="lastname"
+        name="lastname"
+      /><br />
+    </div>
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+      /><br />
+    </div>
+    <div class="form-group">
+      <label for="birthdate">Birthdate:</label>
+      <input
+        type="date"
+        id="birthdate"
+        name="birthdate"
+      /><br />
+    </div>
+    <div align="center">
+      <button
+        type="submit"
+        name="edit-info"
+        class="btn btn-primary"
+      >
+        Edit Info
       </button>
     </div>
-    {% endif %} {% endfor %} {% endif %} {% endwith %}
+  </form>
+</div>
 
-    <div class="container">
-      <form
-        method="POST"
-        action="/admin"
-      >
-        <h3 align="center">Insert School</h3>
-        <div class="form-group">
-          <label for="school_apellation">School Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="school_apellation"
-            name="school_apellation"
-            placeholder="Enter School name"
-          />
-        </div>
-        <div class="form-group">
-          <label for="city">City</label>
-          <input
-            type="text"
-            class="form-control"
-            id="city"
-            name="city"
-            placeholder="Enter city"
-          />
-        </div>
-        <div class="form-group">
-          <label for="postcode">Postcode</label>
-          <input
-            type="number"
-            class="form-control"
-            id="postcode"
-            name="postcode"
-            placeholder="Enter postcode"
-          />
-        </div>
-        <div class="form-group">
-          <label for="phone_number">Phone Number</label>
-          <input
-            type="number"
-            class="form-control"
-            id="phone_number"
-            name="phone_number"
-            placeholder="Enter phone number"
-          />
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="text"
-            class="form-control"
-            id="email"
-            name="email"
-            placeholder="Enter email"
-          />
-        </div>
-        <div class="form-group">
-          <label for="principal">Principal</label>
-          <input
-            type="text"
-            class="form-control"
-            id="principal"
-            name="principal"
-            placeholder="Enter principal name"
-          />
-        </div>
-        <h3 align="center">Insert Librarian</h3>
-        <div class="form-group">
-          <label for="first_name">First Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="first_name"
-            name="first_name"
-            placeholder="Enter first name"
-          />
-        </div>
-        <div class="form-group">
-          <label for="last_name">Last Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="last_name"
-            name="last_name"
-            placeholder="Enter last name"
-          />
-        </div>
-        <div class="form-group">
-          <label for="birthdate">Birthdate</label>
-          <input
-            type="date"
-            class="form-control"
-            id="birthdate"
-            name="birthdate"
-            placeholder="Enter birthdate"
-          />
-        </div>
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            type="username"
-            class="form-control"
-            id="username"
-            name="username"
-            placeholder="Enter username"
-          />
-        </div>
-        <div class="form-group">
-          <label for="password1">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password1"
-            name="password1"
-            placeholder="Enter password"
-          />
-        </div>
-        <div class="form-group">
-          <label for="password2">Password (Confirm)</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password2"
-            name="password2"
-            placeholder="Confirm password"
-          />
-        </div>
-        <br />
-        <div align="center">
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <script>
-      document
-        .getElementById("postcode")
-        .addEventListener("input", function () {
-          var value = parseInt(this.value);
-          if (isNaN(value) || value < 0) {
-            this.setCustomValidity(
-              "Please enter a positive integer for postcode."
-            );
-          } else if (value < 10000 || value >= 100000) {
-            this.setCustomValidity("Postal code should be 5 digits long.");
-          } else {
-            this.setCustomValidity("");
-          }
-        });
-    </script>
-    <script>
-      document
-        .getElementById("phone_number")
-        .addEventListener("input", function () {
-          var value = parseInt(this.value);
-          if (isNaN(value) || value < 0) {
-            this.setCustomValidity(
-              "Please enter a positive integer for phone number."
-            );
-          } else if (value < 1000000000 || value >= 10000000000) {
-            this.setCustomValidity("Phone number should be 10 digits long.");
-          } else {
-            this.setCustomValidity("");
-          }
-        });
-    </script>
-
-    <script
-      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-      crossorigin="anonymous"
-    ></script>
-
-    <script
-      type="text/javascript"
-      src="/static/js/index.js"
-    ></script>
-  </body>
-</html>
+<script>
+  document.getElementById("postcode").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+      this.setCustomValidity("Please enter a positive integer for postcode.");
+    } else if (value < 10000 || value >= 100000) {
+      this.setCustomValidity("Postal code should be 5 digits long.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document
+    .getElementById("phone_number")
+    .addEventListener("input", function () {
+      var value = parseInt(this.value);
+      if (isNaN(value) || value < 0) {
+        this.setCustomValidity(
+          "Please enter a positive integer for phone number."
+        );
+      } else if (value < 1000000000 || value >= 10000000000) {
+        this.setCustomValidity("Phone number should be 10 digits long.");
+      } else {
+        this.setCustomValidity("");
+      }
+    });
+</script>
+{% endblock %}

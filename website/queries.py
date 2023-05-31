@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, flash, jsonify, url_for, redirect, session
 from flask_login import login_required, current_user
-from . import db
+from . import db, app
 from SQL_code.rental_package import book_renter as br
-import mysql.connector
+import mysql.connector, os, datetime
 
 queries = Blueprint("queries", __name__)
 
@@ -200,21 +200,85 @@ def run_query():
 @login_required
 def rent_book():
   if request.method != "POST": return redirect(url_for("views.home"))
-  avail = int(request.form.get("avail_books"))
+  elif session["user_role"] not in ["student", "teacher"]:
+    flash("You cant rent as admin.", category = "error")
+    return redirect(url_for("views.home"))
+  else:
+    avail = int(request.form.get("avail_books"))
 
-  app_user_id = session["_user_id"]
-  requested_book_id = request.form.get("book_id")
-  if avail > 0: action = "rented" 
-  else: action = "reservation"
-  school = session["school_id"]
+    app_user_id = session["_user_id"]
+    requested_book_id = request.form.get("book_id")
+    if avail > 0: action = "rented" 
+    else: action = "reservation"
+    school = session["school_id"]
 
-  mydb = mysql.connector.connect( host = 'localhost',
+    mydb = mysql.connector.connect( host = 'localhost',
                                 user = 'root',
                                 database = 'school_library')
-  mycursor = mydb.cursor(buffered = True)
-  mycursor.execute(f'SELECT school FROM app_user WHERE id = {app_user_id}')
+    mycursor = mydb.cursor(buffered = True)
+    mycursor.execute(f'SELECT school FROM app_user WHERE id = {app_user_id}')
 
-  print("Calling book_rental_runner")
-  br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
-  #flash("Your request has been submitted. Please wait for your library admin to accept it.", category="info")
-  return redirect(url_for("views.home"))
+    print("Calling book_rental_runner")
+    br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
+    #flash("Your request has been submitted. Please wait for your library admin to accept it.", category="info")
+    return redirect(url_for("views.home"))
+  
+@queries.route('/backup')
+@login_required
+def backup():
+    if current_user.get_id() !=1 :
+      return redirect(url_for('views.home'))
+    
+    # Backup file name
+    timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    backup_file = f'backup_{timestamp}.sql'
+    # Backup folder path
+    backup_folder = 'backup'
+    # Create the backup folder if it doesn't exist
+    if not os.path.exists(backup_folder):
+        os.makedirs(backup_folder)
+    backup_file_path = os.path.join(backup_folder, backup_file)
+    # MySQL dump command
+    mysqldump_cmd = f"mysqldump -h {app.config['MYSQL_HOST']} -u {app.config['MYSQL_USER']} {app.config['MYSQL_DB']} > {backup_file_path}"
+    # Execute the mysqldump command
+    os.system(mysqldump_cmd)
+    flash(f"Backup created: {backup_file}", category="success")
+    return redirect(url_for('views.admin'))
+
+@queries.route('/restore')
+@login_required
+def restore():
+    if current_user.get_id() != 1:
+        return redirect(url_for('views.home'))
+
+    # Backup folder path
+    backup_folder = 'backup'
+
+    # Get the list of backup files
+    backup_files = []
+    for filename in os.listdir(backup_folder):
+        if filename.endswith('.sql'):
+            backup_files.append(filename)
+
+    return render_template('restore.html', backup_files=backup_files)
+
+@queries.route('/restore/<backup_file>')
+@login_required
+def restore_backup(backup_file):
+    if current_user.get_id() != 1:
+        return redirect(url_for('views.home'))
+
+    # Backup folder path
+    backup_folder = 'backup'
+
+    # Backup file path
+    backup_path = os.path.join(backup_folder, backup_file)
+
+    # MySQL restore command
+    mysql_restore_cmd = f"mysql -h {app.config['MYSQL_HOST']} -u {app.config['MYSQL_USER']} {app.config['MYSQL_DB']} < {backup_path}"
+
+    # Execute the MySQL restore command
+    os.system(mysql_restore_cmd)
+
+    flash(f"Database restored from backup: {backup_file}", category="success")
+    return redirect(url_for('views.admin'))

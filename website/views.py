@@ -91,6 +91,8 @@ def books():
     if current_user.is_anonymous:
         return render_template("login.html")
     
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     user_id = current_user.get_id()
     query=f"""SELECT b.title, COUNT(bcps.id) AS copy_count, b.image, b.id FROM app_user AS au JOIN school AS s ON au.school = s.id JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id JOIN book AS b ON bcps.book_id = b.id WHERE au.id = {user_id} GROUP BY b.title"""
     
@@ -111,28 +113,26 @@ def books():
     rows = cur.fetchall()
     cur.close()
     
-    modified_rows=[]
     image_url=[]
     ids=[]
                
     for index, row in enumerate(rows):
-        ids.append(row[3]-1)
-        """
-        row_list = list(row)
-        image_blob = row_list[2]
-        if image_blob:
-        # Convert the image BLOB to Base64 encoding
-            image_base64 = base64.b64encode(image_blob).decode('utf-8')
-            row_list[2] = image_base64
-        else:
-            row_list[2] = None
-        modified_row = tuple(row_list)
-        modified_rows.append(modified_row)
-        """
-        
+        ids.append(row[3]-1)        
         image_url.append(url_for('static', filename=f'images/{ids[index]}.png'))
 
     school_name=session["school_name"]
+
+    #get categories
+    cur= db.connection.cursor()
+    cur.execute("SELECT DISTINCT category FROM book;")
+    results = cur.fetchall()
+    cur.close()
+    cats = set()
+    for result in results:
+        category_set = set(result[0].split(','))
+        cats.update(category_set)
+    categories = sorted(cats)
+    session["categories"] = categories
 
     return render_template("books.html", user = current_user, rows=rows, image_url=image_url, 
                                school = school_name, role=session["user_role"], categories=session["categories"])
@@ -143,6 +143,8 @@ def book_page(book_id):
     if current_user.is_anonymous:
         return render_template("login.html")
     else:
+        if current_user.get_id() == 1:
+            return redirect(url_for("views.admin"))
         user_id = current_user.get_id()
         school_id = session["school_id"]
 
@@ -207,6 +209,8 @@ def book_page(book_id):
 @views.route("/queries", methods=["GET", "POST"])
 @login_required
 def queries():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     cur= db.connection.cursor()
     cur.execute("SELECT DISTINCT category FROM book;")
     results = cur.fetchall()
@@ -232,6 +236,8 @@ def queries():
 @views.route("/school-admin", methods=["GET", "POST"])
 @login_required
 def school_admin():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     role=session["user_role"]
     if role != 'school_admin':
         return redirect(url_for("views.home"))
@@ -264,6 +270,8 @@ def school_admin():
 @views.route("/set-active", methods=["POST"])
 @login_required
 def set_active():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     if session["user_role"] == "school_admin":
         user_id = request.form.get("user_id")
         cur = db.connection.cursor()
@@ -277,6 +285,8 @@ def set_active():
 @views.route("/publish-rating", methods=["POST"])
 @login_required
 def publish_rating():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     if session["user_role"] == "school_admin":
         rating_id = request.form.get("rating_id")
         cur = db.connection.cursor()
@@ -290,6 +300,8 @@ def publish_rating():
 @views.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
     if request.method == "POST":
         user =  session["username"]
 
@@ -360,67 +372,139 @@ def admin():
     if current_user.get_id() != 1:
         return redirect(url_for('views.login'))
     if request.method == "POST":
-        school_name = request.form.get("school_apellation")
-        city = request.form.get("city")
-        postcode = request.form.get("postcode")
-        phone_number = request.form.get("phone_number")
-        email = request.form.get("email")
-        principal = request.form.get("principal")
+        if "signup-school" in request.form:
+            school_name = request.form.get("school_apellation")
+            city = request.form.get("city")
+            postcode = request.form.get("postcode")
+            phone_number = request.form.get("phone_number")
+            email = request.form.get("email")
+            principal = request.form.get("principal")
 
-        if not (school_name and city and postcode and phone_number and email and principal):
-            flash("Please fill in all the fields.", category="error")
-            return redirect(url_for('views.admin'))
-        cur = db.connection.cursor()
-        try:
-            cur.execute("INSERT INTO school (appellation, city, postcode, phone_number, email, principal) VALUES (%s, %s, %s, %s, %s, %s)",
-                (school_name, city, postcode, phone_number, email, principal),)
-            db.connection.commit()
-            flash("School inserted succesfully.", category="success")
-            cur.close()
-        except db.connection.IntegrityError:
-            db.connection.rollback()
-            flash("Invalid inputs.", category="error")
-            cur.close()
-            return redirect(url_for('views.admin'))
-
-        cur = db.connection.cursor()
-        cur.execute(f"SELECT id from school WHERE appellation = '{school_name}'")
-        school_id = cur.fetchone()
-        cur.close()
-
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
-        birthdate = request.form.get("birthdate")
-        username = request.form.get("username")
-        password1 = request.form.get("password1")
-        password2 = request.form.get("password2")
-        is_active = 1
-        user_role = 'school_admin'
-
-
-        cur = db.connection.cursor()
-        cur.execute("SELECT * FROM app_user WHERE username = %s", [username])
-        app_user = cur.fetchone()
-        cur.close()
-
-        if app_user:
-            flash("Username already exists.", category="error")
-        if len(username) < 4:
-            flash("Username must be greater than 3 characters.", category="error")
-        elif password1 != password2:
-            flash("Passwords don't match.", category="error")
-        elif len(password1) < 7:
-            flash("Password must be at least 7 characters", category="error")
-        else:
-            # add user to database
+            if not (school_name and city and postcode and phone_number and email and principal and first_name and last_name and birthdate and username and password1 and password2):
+                flash("Please fill in all the fields.", category="error")
+                return redirect(url_for('views.admin'))
             cur = db.connection.cursor()
-            cur.execute(
-                "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, is_active, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, %s, md5(%s))",
-                (first_name, last_name, birthdate, school_id, user_role, is_active, username, password1),
-            )
-            db.connection.commit()
+            try:
+                cur.execute("INSERT INTO school (appellation, city, postcode, phone_number, email, principal) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (school_name, city, postcode, phone_number, email, principal),)
+                db.connection.commit()
+                flash("School inserted succesfully.", category="success")
+                cur.close()
+            except db.connection.IntegrityError:
+                db.connection.rollback()
+                flash("Invalid inputs.", category="error")
+                cur.close()
+                return redirect(url_for('views.admin'))
+
+            cur = db.connection.cursor()
+            cur.execute(f"SELECT id from school WHERE appellation = '{school_name}'")
+            school_id = cur.fetchone()
             cur.close()
 
-        flash("School and its librarian added succesfully.", category="success")
+            first_name = request.form.get("first_name")
+            last_name = request.form.get("last_name")
+            birthdate = request.form.get("birthdate")
+            username = request.form.get("username")
+            password1 = request.form.get("password1")
+            password2 = request.form.get("password2")
+            is_active = 1
+            user_role = 'school_admin'
 
-    return render_template("admin.html", user = current_user)
+
+            cur = db.connection.cursor()
+            cur.execute("SELECT * FROM app_user WHERE username = %s", [username])
+            app_user = cur.fetchone()
+            cur.close()
+
+            if app_user:
+                flash("Username already exists.", category="error")
+            if len(username) < 4:
+                flash("Username must be greater than 3 characters.", category="error")
+            elif password1 != password2:
+                flash("Passwords don't match.", category="error")
+            elif len(password1) < 7:
+                flash("Password must be at least 7 characters", category="error")
+            else:
+                # add user to database
+                cur = db.connection.cursor()
+                cur.execute(
+                    "INSERT INTO app_user (first_name, last_name, birthdate, school, user_role, is_active, username, userpassword) VALUES (%s, %s, %s, %s, %s, %s, %s, md5(%s))",
+                    (first_name, last_name, birthdate, school_id, user_role, is_active, username, password1),
+                )
+                db.connection.commit()
+                cur.close()
+
+            flash("School and its librarian added succesfully.", category="success")
+        
+        elif "edit-info" in request.form:
+            username = None
+            school_id = request.form.get("school")
+            new_username = request.form.get("username")
+            new_name = request.form.get("name")
+            new_lastname = request.form.get("lastname")
+            new_bdate = request.form.get("birthdate")
+            if school_id :
+                cur = db.connection.cursor()
+                cur.execute(f"SELECT * FROM app_user WHERE school = '{school_id}' AND user_role = 'school_admin';")
+                user = cur.fetchone()
+                cur.close()
+
+                username = user[7]
+            else:
+                return redirect(url_for('views.admin'))
+
+                    
+            if new_name and new_lastname:
+                cur = db.connection.cursor()
+                cur.execute("UPDATE app_user SET first_name= %s, last_name= %s WHERE username= %s;", (new_name, new_lastname, username))
+                db.connection.commit()
+                cur.close()
+                flash("Name and Lastname updated succesfully.", category="success")
+
+            if new_bdate:
+                date_object = datetime.strptime(new_bdate, "%Y-%m-%d")
+                current_year = date.today().year
+
+                if current_year - date_object.year < 18:
+                    flash("Librarian cant be less than 18 years old.", category="error")
+                    return redirect(url_for('views.admin'))
+                else:  
+                    cur = db.connection.cursor()
+                    cur.execute("UPDATE app_user SET birthdate= %s WHERE username= %s;", (new_bdate, username))
+                    db.connection.commit()
+                    cur.close()
+                    flash("Birthdate updated succesfully.", category="success")
+            
+            if new_username:
+                cur = db.connection.cursor()
+                cur.execute("SELECT username FROM app_user;")
+                result=cur.fetchall()
+                cur.close()
+                users=list(result)
+
+                if len(new_username) < 4:
+                    flash("Username must be greater than 3 character.", category="error")
+                    return redirect(url_for('views.admin'))
+                elif new_username in users:
+                    flash("Username already exists.", category="error")
+                    return redirect(url_for('views.admin'))
+                else:
+                    cur = db.connection.cursor()
+                    cur.execute("UPDATE app_user SET username= %s WHERE username= %s;", (new_username, username))
+                    db.connection.commit()
+                    cur.close()
+                    flash("Username updated succesfully.", category="success")    
+            
+            return redirect(url_for('views.admin'))
+    else:
+        cur = db.connection.cursor()
+        cur.execute("SELECT * FROM school;")
+        schools = cur.fetchall()
+        cur.close()
+
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT au.first_name, au.last_name, s.appellation FROM app_user as au INNER JOIN school as s ON au.school = s.id WHERE au.user_role = 'school_admin';")
+        librarians = cur.fetchall()
+        cur.close()
+
+        return render_template("admin.html", schools = schools, librarians=librarians)
