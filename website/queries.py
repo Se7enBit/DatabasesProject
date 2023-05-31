@@ -179,7 +179,7 @@ def run_query():
         category = request.form.get("category")
         criteria = category
         if category:
-          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE book.category = '{category}';"""
+          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE FIND_IN_SET('{category}', book.category);"""
       
       if query:
         query2_3=['','']
