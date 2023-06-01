@@ -22,19 +22,19 @@ def run_query():
       if ("titleCheckbox") in request.form:
         title = request.form.get("title")
         if title:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE book.title LIKE '%{title}%';"
+          query = f"SELECT writer.id, GROUP_CONCAT(CONCAT(writer.first_name, ' ', writer.last_name) SEPARATOR ', ') AS writer_names, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE book.title LIKE '%{title}%' GROUP BY book.id;"
       elif ("categoryCheckbox") in request.form:
         category = request.form.get("category")
         if category:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE FIND_IN_SET('{category}', category);"
+          query = f"SELECT writer.id, GROUP_CONCAT(CONCAT(writer.first_name, ' ', writer.last_name) SEPARATOR ', ') AS writer_names, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE FIND_IN_SET('{category}', category) GROUP BY book.id;"
       elif ("writerCheckbox") in request.form:
         writer = request.form.get("writer")
         if writer:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE writer.last_name LIKE '%{writer}%' OR writer.first_name LIKE '%{writer}%';"
+          query = f"SELECT writer.id, GROUP_CONCAT(CONCAT(writer.first_name, ' ', writer.last_name) SEPARATOR ', ') AS writer_names, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id WHERE writer.last_name LIKE '%{writer}%' OR writer.first_name LIKE '%{writer}%' GROUP BY book.id;"
       elif ("copiesCheckbox") in request.form:
         copies = request.form.get("copies")
         if copies:
-          query = f"SELECT writer.first_name, writer.last_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
+          query = f"SELECT writer.id, CONCAT(writer.first_name, ' ', writer.last_name) AS writer_name, book.* FROM book JOIN book_writer ON book.id = book_writer.book_id JOIN writer ON book_writer.writer_id = writer.id JOIN book_copies_per_school ON book.id = book_copies_per_school.book_id GROUP BY book.id HAVING COUNT(book_copies_per_school.id) = {copies};"
 
       if query:
         cur = db.connection.cursor()
@@ -59,7 +59,7 @@ def run_query():
         category = request.form.get("category")
         criteria = category
         if category:
-          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE book.category = '{category}';"""
+          query = f"""SELECT AVG(book_rating.rating) FROM book_rating JOIN book ON book_rating.book_id = book.id WHERE FIND_IN_SET('{category}', book.category);"""
       
       if query:
         query2_3=['','']
