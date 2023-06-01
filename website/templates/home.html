@@ -1,12 +1,4 @@
-{% extends "base.html" %}{% block title %}Home{% endblock %}{% block navbar %}
-{% if role == 'school_admin'%}
-<a
-  class="nav-link"
-  id="queries"
-  href="/queries"
-  >Advanced Tools</a
->
-{% endif %} {% endblock %}{% block content %}
+{% extends "base.html" %}{% block title %}Home{% endblock %} {% block content %}
 <div style="display: flex; justify-content: center; align-items: center">
   <svg
     fill="#0000000"

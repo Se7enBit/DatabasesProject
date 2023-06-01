@@ -1,14 +1,6 @@
 {% extends "base.html" %}
-{% block title %} {{name}} {% endblock %}{% block navbar
-  %} {% if role == 'school_admin'%}
-  <a
-    class="nav-link"
-    id="queries"
-    href="/queries"
-    >Advanced Tools</a
-  >
-  {% endif %}
-  {% endblock %}
+{% block title %} {{name}} {% endblock %}
+
 {% block content %}
   <div class="container">
       <h1 style="padding-top:10px">{{name}}</h1>
