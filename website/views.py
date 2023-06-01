@@ -35,7 +35,7 @@ def home():
             cur = db.connection.cursor()
             cur.execute(f"""select book.*, book_rental.request_datetime, book_rental.rental_datetime, book_rental.return_datetime, book_rental.rental_status
                         from book join book_rental ON book.id = book_rental.book_id
-                        where book_rental.app_user_id = {id} and book_rental.rental_status in ("reservation", "rented", "late to return", "returned");""")
+                        where book_rental.app_user_id = {id} and book_rental.rental_status in ("reservation", "rented", "late to return", "returned") AND book_rental.is_active=1;""")
             rented_books = cur.fetchall()
             cur.close()
             img_for_rented=[]
@@ -67,23 +67,7 @@ def home():
 
         #SCHOOL ADMIN
         elif session["user_role"] == "school_admin":
-            school=session["school_name"]
-            school_id=session["school_id"]
-            inactive_users = None
-            unpublished_ratings = None
-
-            cur = db.connection.cursor()
-            cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0 AND user_role IN ('student', 'teacher');")
-            inactive_users= cur.fetchall()
-            cur.close()
-
-            cur = db.connection.cursor()
-            cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
-            unpublished_ratings= cur.fetchall()
-            cur.close()
-            print(unpublished_ratings)
-
-            return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"])
+            return redirect(url_for("views.school_admin"))
 
 @views.route("/books", methods=["GET", "POST"])
 @login_required
@@ -193,14 +177,13 @@ def book_page(book_id):
                 is_published = 0
                 if session["user_role"] == 'teacher':
                     is_published = 1
-                print(f"""Running querry: INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', {is_published});""")
                 cur.execute(f"""INSERT INTO book_rating (book_id, app_user_id, rating, comments, is_published) VALUES ({book_id}, {user_id}, '{rating}', '{comment}', {is_published});""")
                 db.connection.commit()
                 cur.close()
                 flash("Rating submitted succesfully! It will be published when your school admin approves it.", category="success")
                 return redirect(url_for('views.book_page', book_id= book_id))
 
-        return render_template("book_page.html", user=current_user, book_id=book_info[0],
+        return render_template("book_page.html", user=current_user, user_role=session["user_role"], book_id=book_info[0],
                                name=book_info[1], publisher=book_info[2], isbn=book_info[3],
                                num_pages=book_info[4], categories=book_info[5], abstract=book_info[6],
                                language=book_info[7], image_url=image_url, keywords=book_info[9], writer=writer,
@@ -232,8 +215,16 @@ def queries():
     for user in school_users: session["school_users"].append(user)
     cur.close()
     
-    return render_template("queries.html", user=current_user, role=session["user_role"], 
-                           categories=categories, school_users=session["school_users"])
+    #Manage Rentals
+    cur = db.connection.cursor()
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1;""")
+    rented_books = cur.fetchall()
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='reservation' AND br.is_active=1;""")
+    reserved_books = cur.fetchall()
+    cur.close()
+
+    return render_template("queries.html", user=current_user, role=session["user_role"], rented_books=rented_books,
+                           reserved_books=reserved_books, categories=categories, school_users=session["school_users"])
 
 @views.route("/queries-admin", methods=["GET", "POST"])
 @login_required
@@ -266,26 +257,32 @@ def school_admin():
         school_id=session["school_id"]
         inactive_users = None
         unpublished_ratings = None
+
+        #Find unpublished ratings
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
+        unpublished_ratings = cur.fetchall()
+        cur.close()
+        
+        #Find rental requests
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT br.id AS rental_id, u.username, b.title, br.request_datetime, br.rental_status FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={school_id} AND br.is_active=0;")
+        book_orders = cur.fetchall()
+        cur.close()
+
+        #Find late-to-return
+        cur = db.connection.cursor()
+        cur.execute(f"SELECT u.id, u.first_name, u.last_name, br.book_copy_id, DATEDIFF(NOW(), br.rental_datetime)-7 AS days_late FROM app_user u JOIN book_rental br ON u.id = br.app_user_id WHERE u.school = {school_id} AND br.late_to_return = 1;")
+        late = cur.fetchall()
+        cur.close()
         
         #Find inactive users
         cur = db.connection.cursor()
         cur.execute(f"SELECT * FROM app_user WHERE school = {school_id} AND is_active = 0;")
         inactive_users= cur.fetchall()
         cur.close()
-
-        #Find unpublished ratings
-        cur = db.connection.cursor()
-        cur.execute(f"SELECT br.id AS rating_id, b.title AS book_title, au.username, br.rating, br.comments FROM book_rating AS br INNER JOIN book AS b ON br.book_id = b.id INNER JOIN app_user AS au ON br.app_user_id = au.id WHERE br.is_published = 0 AND au.school = {school_id};")
-        unpublished_ratings= cur.fetchall()
-        cur.close()
-        
-        #Find late-to-return
-        cur = db.connection.cursor()
-        cur.execute(f"SELECT u.id, u.first_name, u.last_name, br.book_copy_id, DATEDIFF(NOW(), br.rental_datetime)-7 AS days_late FROM app_user u JOIN book_rental br ON u.id = br.app_user_id WHERE u.school = {school_id} AND br.late_to_return = 1;")
-        late = cur.fetchall()
-        cur.close()
-
-        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, ratings=unpublished_ratings, role=session["user_role"], late=late)
+        return render_template("librarian.html",user=current_user, school=school, users=inactive_users, book_orders=book_orders,
+                               ratings=unpublished_ratings, role=session["user_role"], late=late)
 
 @views.route("/set-active", methods=["POST"])
 @login_required

@@ -59,6 +59,14 @@ AND w.first_name LIKE "%ONOMA%"
 OR w.last_name LIKE "%EPONIMO%"
 GROUP BY b.title
 
+-- Select all inactive rentals in given school
+SELECT br.id AS rental_id, u.username, b.title, br.request_datetime
+FROM book_rental br
+JOIN app_user u ON u.id=br.app_user_id
+JOIN book b ON b.id=br.book_id
+WHERE u.school=1
+AND br.is_active=0;
+
 --3.1.2 (first part)
 SELECT writer.* FROM writer JOIN book_writer
     -> ON writer.id = book_writer.writer_id
@@ -112,3 +120,14 @@ HAVING book_count < (SELECT MAX(book_count)
                             FROM book_writer 
                             GROUP BY writer_id) AS subquery)-5 
 ORDER BY book_count DESC;
+
+
+
+-------------------VVV PLAYING AREA VVV--------------------
+SELECT br.id AS rental_id, u.username, b.title, br.request_datetime
+FROM book_rental br
+JOIN app_user u ON u.id=br.app_user_id
+JOIN book b ON b.id=br.book_id
+WHERE u.school=1
+AND br.rental_status='rented'
+AND br.is_active=1;

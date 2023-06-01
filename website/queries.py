@@ -216,11 +216,9 @@ def rent_book():
     return redirect(url_for("views.home"))
   else:
     avail = int(request.form.get("avail_books"))
-
     app_user_id = session["_user_id"]
     requested_book_id = request.form.get("book_id")
-    if avail > 0: action = "rented" 
-    else: action = "reservation"
+    action = request.form.get("action")
     school = session["school_id"]
 
     mydb = mysql.connector.connect( host = 'localhost',
@@ -231,9 +229,67 @@ def rent_book():
 
     print("Calling book_rental_runner")
     br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
-    #flash("Your request has been submitted. Please wait for your library admin to accept it.", category="info")
+    flash("Your request has been submitted. Please wait for your school admin to approve it.", category="info")
     return redirect(url_for("views.home"))
-  
+
+@queries.route("/manage-rental", methods=["POST"])
+@login_required
+def approve_rental():
+  if request.method != "POST" or session["user_role"]!="school_admin" or "rental_id" not in request.form:
+    return redirect(url_for("views.home"))
+
+  rental_id=request.form.get("rental_id")
+  rental_status=request.form.get("rental_status")
+  came_from=request.form.get("send_to")
+
+  if request.form.get("action")=="approve":
+    cur = db.connection.cursor()
+    cur.execute(f"UPDATE book_rental SET is_active=1 WHERE book_rental.id={rental_id}")
+    db.connection.commit()
+    cur.close()
+
+  elif request.form.get("action")=="disapprove":
+    if rental_status == "rented":
+      new_status="returned"
+    else:
+      new_status="cancelled"
+    cur = db.connection.cursor()
+    cur.execute(f"UPDATE book_rental SET is_active=1, rental_status='{new_status}' WHERE book_rental.id={rental_id}")
+    db.connection.commit()
+    cur.close()
+
+  elif request.form.get("action")=="return":
+    mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
+    mycursor = mydb.cursor(buffered = True)
+    mycursor.execute(f"SELECT app_user_id, book_id FROM book_rental WHERE id={rental_id};")
+    result=mycursor.fetchall()
+    user_id=result[0][0]
+    book_id=result[0][1]
+    br.book_rental_runner(user_id, book_id, 'returned', session["school_id"], mycursor, mydb)
+    
+  elif request.form.get("action")=="rent":
+    mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
+    mycursor = mydb.cursor(buffered = True)
+    mycursor.execute(f"SELECT app_user_id, book_id FROM book_rental WHERE id={rental_id};")
+    result=mycursor.fetchall()
+    user_id=result[0][0]
+    book_id=result[0][1]
+    br.book_rental_runner(user_id, book_id, 'rented', session["school_id"], mycursor, mydb)
+
+  elif request.form.get("action")=="cancel":
+    mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
+    mycursor = mydb.cursor(buffered = True)
+    mycursor.execute(f"SELECT app_user_id, book_id FROM book_rental WHERE id={rental_id};")
+    result=mycursor.fetchall()
+    user_id=result[0][0]
+    book_id=result[0][1]
+    print(result)
+    print(rental_id)
+    br.book_rental_runner(user_id, book_id, 'cancelled', session["school_id"], mycursor, mydb)
+
+  flash("Action performed succesfully", category="success")
+  return redirect(url_for(came_from))
+
 @queries.route('/backup')
 @login_required
 def backup():

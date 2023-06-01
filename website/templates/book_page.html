@@ -31,7 +31,10 @@
           <form action="{{ url_for('queries.rent_book') }}" method="post">
             <input type="hidden" name="book_id" value="{{book_id}}">
             <input type="hidden" name="avail_books" value={{available[1]}}>
-            <button class="button">Order</button>
+            {% if user_role in ("student", "teacher") %}
+              <button class="button" name="action" value="rented">Rent</button>
+              <button class="button" name="action" value="reservation">Reserve</button>
+            {% endif %}
           </form>
         </div>
     </div>

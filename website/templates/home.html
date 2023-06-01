@@ -92,7 +92,7 @@
     <h3 class="product-title"><a href="/books/{{book[0]}}">{{book[1]}}</a></h3>
     <p class="book-description"><b>Publisher:</b> {{book[2]}}</p>
     <p class="book-description"><b>Status:</b> {{book[-1]}}</p>
-    <p class="book-description"><b>Returned at:</b> {{book[-2]}}</p>
+    <p class="book-description"><b>{{book[-1]}} at:</b> {{book[-2]}}</p>
   </div>
 </div>
 {% endfor %} {% endif %}

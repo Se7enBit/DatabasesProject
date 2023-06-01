@@ -1,52 +1,24 @@
 {% extends "base.html" %}{% block title %}School Admin Page{% endblock %}{%
 block navbar %} {% if role == 'school_admin'%}
+<li class="nav-item"></li>
 <a
   class="nav-link"
   id="queries"
   href="/queries"
-  >Advanced Tools</a
->
+  >
+  Advanced Tools
+</a>
+</li>
 {% endif %} {% endblock %}{% block content %}
 <h1 align="center">{{school}} Admin Page</h1>
-<!-- Inactive Users -->
-<div class="container">
-  <div class="page-section">
-    <h6 style="text-align: left; text-decoration-line: underline">
-      Inactive Users
-    </h6>
-    <ul>
-      {% for user in users %}
-      <li class="section-item">
-        {{user[1]}} {{user[2]}} , role: {{user[5]}}
-        <form
-          action="/set-active"
-          method="POST"
-          style="display: inline"
-        >
-          <input
-            type="hidden"
-            name="user_id"
-            value="{{ user[0] }}"
-          />
-          <button
-            type="submit"
-            class="btn btn-sm btn-success"
-          >
-            Activate
-          </button>
-        </form>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
+
 <!-- Unpublished Ratings -->
 <div class="container">
   <div class="page-section">
     <h6 style="text-align: left; text-decoration-line: underline">
       Unpublished Ratings
     </h6>
-    <ul>
+    <ul class="scrollbox">
       {% for rating in ratings %}
       <li class="section-item">
         <b>For: </b>{{rating[1]}}<b> From: </b>{{rating[2]}}
@@ -76,18 +48,85 @@ block navbar %} {% if role == 'school_admin'%}
     </ul>
   </div>
 </div>
+
+<!-- Book Rental Requests -->
+<div class="container">
+  <div class="page-section">
+    <h6 style="text-align: left; text-decoration-line: underline">
+      Book Rental Requests
+    </h6>
+    <ul class="scrollbox">
+      {% for order in book_orders %}
+      <li class="section-item">
+        <b>{{order[1]}}</b><br>
+        <div class="comment-date">{{order[3]}}</div>
+        {{order[2]}}<br>
+        {{order[4]}} request<br>
+        <form action="/manage-rental" method="POST" style="display: inline" >
+          <input type="hidden" name="rental_id" value="{{ order[0] }}" />
+          <input type="hidden" name="rental_status" value="{{ order[4] }}" />
+          <input type="hidden" name="send_to" value="views.home" />
+          <button name="action" value="approve" type="submit" class="btn btn-sm btn-success" >
+            Approve
+          </button>
+          <button name="action" value="disapprove" type="submit" class="btn btn-sm btn-danger" >
+            Disapprove
+          </button>
+        </form>
+        <!-- <form action="/set-active" method="POST" style="display: inline" >
+          <input type="hidden" name="rental_id" value="{{ order[0] }}" />
+        </form> -->
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
 <!-- Late to Return -->
 <div class="container">
   <div class="page-section">
     <h6 style="text-align: left; text-decoration-line: underline">
       Late to Return
     </h6>
-    <ul>
+    <ul class = "scrollbox">
       {% for user in late %}
       <li class="section-item">
         <b>{{user[1]}} {{user[2]}}</b><br />
         book copy id: {{user[3]}}<br />
         days late: {{user[4]}}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- Inactive Users -->
+<div class="container">
+  <div class="page-section">
+    <h6 style="text-align: left; text-decoration-line: underline">
+      Inactive Users
+    </h6>
+    <ul class="scrollbox">
+      {% for user in users %}
+      <li class="section-item">
+        {{user[1]}} {{user[2]}} , role: {{user[5]}}
+        <form
+          action="/set-active"
+          method="POST"
+          style="display: inline"
+        >
+          <input
+            type="hidden"
+            name="user_id"
+            value="{{ user[0] }}"
+          />
+          <button
+            type="submit"
+            class="btn btn-sm btn-success"
+          >
+            Activate
+          </button>
+        </form>
       </li>
       {% endfor %}
     </ul>
