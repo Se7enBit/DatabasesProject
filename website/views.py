@@ -196,6 +196,13 @@ def queries():
         return redirect(url_for("views.admin"))
     if session["user_role"] != "school_admin":
         return redirect(url_for("views.home"))
+    
+    #Search by name
+    arg=""
+    if request.method=="POST" and "name" in request.form:
+        name=request.form.get("name")
+        arg=f" AND u.username LIKE '%{name}%'"
+
     cur= db.connection.cursor()
     cur.execute("SELECT DISTINCT category FROM book;")
     results = cur.fetchall()
@@ -217,9 +224,9 @@ def queries():
     
     #Manage Rentals
     cur = db.connection.cursor()
-    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1;""")
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1{arg};""")
     rented_books = cur.fetchall()
-    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='reservation' AND br.is_active=1;""")
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='reservation' AND br.is_active=1{arg};""")
     reserved_books = cur.fetchall()
     cur.close()
 

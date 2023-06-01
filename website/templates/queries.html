@@ -216,60 +216,70 @@
   </form>
 
   <!-- Book Rentals and Book Reservations -->
-  <div class="form-group" style="width:100%; display:flex;">
-    <form action="/manage-rental" method="POST">
-      <div class="section-item" style="width:99%;">
-        <h4>Manage Rentals</h4>
-        <ul class="scrollbox">
-          {% for book in rented_books %}
-            <li class="product">
-              <div style="display: flex; flex-direction:column; justify-content:center; align-items: center;">
-                <p>{{book[0]}}</p>
-                <button name="action" value="return" type="submit" class="btn btn-sm btn-success">
-                  Returned
-                </button>
-                <input type="hidden" name="rental_id" value="{{ book[0] }}" />
-                <input type="hidden" name="rental_status" value="rented" />
-                <input type="hidden" name="send_to" value="views.queries" />
-              </div>
-              <div style="margin-left: 7px;">
-                <b>{{book[1]}}</b><br>
-                <div class="comment-date">{{book[3]}}</div>
-                {{book[2]}}<br>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </form>
-    <form action="/manage-rental" method="POST">
-      <div class="section-item" style="width:99%; margin-left:auto;">
-        <h4>Manage Reservations</h4>
-        <ul class="scrollbox">
-          {% for book in reserved_books %}
-            <li class="product">
-              <div style="display: flex; flex-direction:column; justify-content:center; align-items: center;">
-                {{book[0]}}
-                <button name="action" value="rent" type="submit" class="btn btn-sm btn-success">
-                  Rent
-                </button>
-                <button name="action" value="cancel" type="submit" class="btn btn-sm btn-danger" style="margin-top:2px">
-                  Cancel
-                </button>
-                <input type="hidden" name="rental_id" value="{{ book[0] }}" />
-                <input type="hidden" name="rental_status" value="rented" />
-                <input type="hidden" name="send_to" value="views.queries" />
-              </div>
-              <div style="margin-left: 7px;">
-                <b>{{book[1]}}</b><br>
-                <div class="comment-date">{{book[3]}}</div>
-                {{book[2]}}<br>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </form>
+  <div class="form-group" style="width:100%; display: flex; flex-direction:column; justify-content:center; align-items: center; padding-top:10px;">
+    <div style="display:flex;">
+      <form action="/queries" method="POST">
+        <input type="text" name="name" placeholder="Search by username"/>
+        <button type="submit" id="search" class="btn btn-primary">
+          Search
+        </button>
+      </form>
+    </div>
+    <div style="display:flex;">
+      <form action="/manage-rental" method="POST">
+        <div class="section-item" style="width:99%;">
+          <h4>Manage Rentals</h4>
+          <ul class="scrollbox">
+            {% for book in rented_books %}
+              <li class="product">
+                <div style="display: flex; flex-direction:column; justify-content:center; align-items: center;">
+                  <p>{{book[0]}}</p>
+                  <button name="action" value="return" type="submit" class="btn btn-sm btn-success">
+                    Returned
+                  </button>
+                  <input type="hidden" name="rental_id" value="{{ book[0] }}" />
+                  <input type="hidden" name="rental_status" value="rented" />
+                  <input type="hidden" name="send_to" value="views.queries" />
+                </div>
+                <div style="margin-left: 7px;">
+                  <b>{{book[1]}}</b><br>
+                  <div class="comment-date">{{book[3]}}</div>
+                  {{book[2]}}<br>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </form>
+      <form action="/manage-rental" method="POST">
+        <div class="section-item" style="width:99%; margin-left:auto;">
+          <h4>Manage Reservations</h4>
+          <ul class="scrollbox">
+            {% for book in reserved_books %}
+              <li class="product">
+                <div style="display: flex; flex-direction:column; justify-content:center; align-items: center;">
+                  {{book[0]}}
+                  <button name="action" value="rent" type="submit" class="btn btn-sm btn-success">
+                    Rent
+                  </button>
+                  <button name="action" value="cancel" type="submit" class="btn btn-sm btn-danger" style="margin-top:2px">
+                    Cancel
+                  </button>
+                  <input type="hidden" name="rental_id" value="{{ book[0] }}" />
+                  <input type="hidden" name="rental_status" value="rented" />
+                  <input type="hidden" name="send_to" value="views.queries" />
+                </div>
+                <div style="margin-left: 7px;">
+                  <b>{{book[1]}}</b><br>
+                  <div class="comment-date">{{book[3]}}</div>
+                  {{book[2]}}<br>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 <script>
