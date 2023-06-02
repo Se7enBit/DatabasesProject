@@ -229,12 +229,12 @@ def rent_book():
 
     print("Calling book_rental_runner")
     br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
-    flash("Your request has been submitted. Please wait for your school admin to approve it.", category="info")
+    flash("Your request has been submitted. Please wait for your school admin to approve it.", category="warning")
     return redirect(url_for("views.home"))
 
 @queries.route("/manage-rental", methods=["POST"])
 @login_required
-def approve_rental():
+def manage_rental():
   if request.method != "POST" or session["user_role"]!="school_admin" or "rental_id" not in request.form:
     return redirect(url_for("views.home"))
 

@@ -226,6 +226,93 @@
     </div>
   </form>
 
+  <!-- Manage Users -->
+  <div
+    class="form-group"
+    style="
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-top: 10px;
+    "
+  >
+    <h4>Manage Users</h4>
+    <div style="display: flex">
+      <form
+        action="/queries"
+        method="POST"
+      >
+        <input
+          type="text"
+          name="manage_user_name"
+          placeholder="Search by username"
+        />
+        <button
+          type="submit"
+          id="search"
+          class="btn btn-primary"
+        >
+          Search
+        </button>
+      </form>
+    </div>
+    <form
+      action="/queries"
+      method="post"
+      class="section-item"
+      style="padding: 5px; width: 100%"
+    >
+      <ul
+        class="scrollbox"
+        style="width: 100%"
+      >
+        {% for user in school_users %}
+        <li
+          class="product"
+          style="margin: 7px; width: 90%"
+        >
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <button
+              name="user-action"
+              value="deactivate"
+              type="submit"
+              class="btn btn-sm btn-warning"
+            >
+              Deactivate
+            </button>
+            <button
+              name="user-action"
+              value="delete"
+              type="submit"
+              class="btn btn-sm btn-danger"
+              style="margin-top: 2px"
+            >
+              Delete
+            </button>
+            <input
+              type="hidden"
+              name="user-id"
+              value="{{user[0]}}"
+            />
+          </div>
+          <div style="margin-left: 7px">
+            <b>({{user[0]}}) {{user[1]}}</b><br />
+            {{user[2]}} {{user[3]}}, {{user[4]}}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </form>
+  </div>
+
   <!-- Book Rentals and Book Reservations -->
   <div
     class="form-group"
@@ -257,19 +344,25 @@
         </button>
       </form>
     </div>
-    <div style="display: flex">
-      <form
-        action="/manage-rental"
-        method="POST"
+    <div style="display: flex; align-items: center">
+      <div
+        class="section-item"
+        style="margin-right: 3px; flex-grow: 1"
       >
-        <div
-          class="section-item"
-          style="width: 99%"
+        <form
+          action="/manage-rental"
+          method="POST"
         >
           <h4>Manage Rentals</h4>
-          <ul class="scrollbox">
+          <ul
+            class="scrollbox"
+            style="height: 400px; width: 100%"
+          >
             {% for book in rented_books %}
-            <li class="product">
+            <li
+              class="product"
+              style="width: 100%"
+            >
               <div
                 style="
                   display: flex;
@@ -306,23 +399,26 @@
               <div style="margin-left: 7px">
                 <b>{{book[1]}}</b><br />
                 <div class="comment-date">{{book[3]}}</div>
-                {{book[2]}}<br />
+                ({{book[4]}}) {{book[2]}}<br />
               </div>
             </li>
             {% endfor %}
           </ul>
-        </div>
-      </form>
-      <form
-        action="/manage-rental"
-        method="POST"
+        </form>
+      </div>
+      <div
+        class="section-item"
+        style="margin-left: 3px; flex-grow: 1"
       >
-        <div
-          class="section-item"
-          style="width: 99%; margin-left: auto"
+        <form
+          action="/manage-rental"
+          method="POST"
         >
           <h4>Manage Reservations</h4>
-          <ul class="scrollbox">
+          <ul
+            class="scrollbox"
+            style="height: 400px; width: 100%"
+          >
             {% for book in reserved_books %}
             <li class="product">
               <div
@@ -375,8 +471,8 @@
             </li>
             {% endfor %}
           </ul>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </div>
