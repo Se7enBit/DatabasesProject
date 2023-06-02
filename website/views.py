@@ -6,6 +6,9 @@ from datetime import datetime, date
 
 views = Blueprint("views", __name__)
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'png'
+
 
 # this will run every time we go to home
 @views.route("/", methods=["GET", "POST"])
@@ -612,25 +615,30 @@ def manage_books():
             lang = request.form.get("lang")
             keywords = request.form.get("keywords")
 
-            image = request.form.get("image")
             categories = request.form.get("categories")
 
             try:
-                cur = db.connection.cursor()
-                book_insertion = f"INSERT INTO book (title, publisher, isbn, number_of_pages, category, abstract, image, keywords, lang) VALUES ('{title}', '{publisher}', '{isbn}', '{number_of_pages}', '{categories}', '{abstract}', '{image}','{keywords}', '{lang}');"
-                cur.execute(book_insertion)
-                db.connection.commit()
-                cur.close()
+                image = request.files["image"]
+                print(image.filename)
+                if image and allowed_file(image.filename):
+                    
+                    cur = db.connection.cursor()
+                    book_insertion = f"INSERT INTO book (title, publisher, isbn, number_of_pages, category, abstract, image, keywords, lang) VALUES ('{title}', '{publisher}', '{isbn}', '{number_of_pages}', '{categories}', '{abstract}', 'url','{keywords}', '{lang}');"
+                    cur.execute(book_insertion)
+                    db.connection.commit()
+                    cur.close()
 
-                cur = db.connection.cursor()
-                get_book_id = f"SELECT id from book WHERE title='{title};'"
-                cur.execute(get_book_id)
-                book_id = cur.fetchone()
-                cur.close()
+                    cur = db.connection.cursor()
+                    get_book_id = f"SELECT id from book WHERE title='{title}' AND publisher='{publisher}';"
+                    cur.execute(get_book_id)
+                    book_id = cur.fetchone()
+                    cur.close()
                 
-                image_id = book_id-1
-                #save image in static/images/{image_id}.png and in ./images/{image_id}.png #
-                """ here """
+                    image_id = book_id[0]-1
+                    image.save('website/static/images/' + f"{image_id}.png")
+                else:
+                    flash("Image should be in png format.", category="error")
+                    return redirect(url_for('views.manage_books'))
 
             except db.connection.IntegrityError:
                 db.connection.rollback()
@@ -645,13 +653,15 @@ def manage_books():
                 writers_mini_list.append(writer_input)
 
             for writer in writers_mini_list:
-                first_name = writer.strip().split(' ')[1:]
+                first_name = ''
+                for item in writer.strip().split(' ')[1:]:
+                    first_name += f' {item}'
+                print(first_name)
                 last_name = writer.strip().split(' ')[0]
 
                 #search if writer exists, if not insert it in the database
                 cur = db.connection.cursor()
-                search_writer = f"SELECT first_name, last_name from writer where first_name = '{first_name}' and last_name = '{last_name}';"
-                cur.execute(search_writer)
+                cur.execute(f"SELECT * FROM writer WHERE first_name = '{first_name}' AND last_name = '{last_name}';")
                 result = cur.fetchone()
                 cur.close()
                 if not result:
@@ -663,14 +673,14 @@ def manage_books():
                 
                 #get writer id
                 cur = db.connection.cursor()
-                id_writer_query = f"SELECT id FROM writer where first_name = '{first_name}' and last_name = '{last_name}';"
+                id_writer_query = f"SELECT id FROM writer where first_name = '{first_name}' AND last_name = '{last_name}';"
                 cur.execute(id_writer_query)
                 writer_id = cur.fetchone()
                 cur.close()
 
                 #insert book_writer
                 cur = db.connection.cursor()
-                query = f"INSERT INTO book_writer (book_id, writer_id) VALUES ('{book_id}', '{writer_id}');"
+                query = f"INSERT INTO book_writer (book_id, writer_id) VALUES ('{book_id[0]}', '{writer_id[0]}');"
                 cur.execute(query)
                 db.connection.commit()
                 cur.close()
