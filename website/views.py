@@ -532,3 +532,117 @@ def admin():
         cur.close()
 
         return render_template("admin.html", schools = schools, librarians=librarians)
+    
+@views.route("/manage-books", methods=["GET", "POST"])
+@login_required
+def manage_books():
+    if current_user.get_id() == 1:
+        return redirect(url_for("views.admin"))
+    if session["user_role"] != "school_admin":
+        return redirect(url_for("views.home"))
+    
+    school_id = session["school_id"]
+    user_id = current_user.get_id()  
+
+    if request.method == "POST":
+        
+        if "add-book-copy" in request.form:
+            book_id = request.form.get("book_id")
+            cur = db.connection.cursor()
+            cur.execute(f"INSERT INTO book_copies_per_school (book_id, school_id) VALUES ('{book_id}', '{school_id}');")
+            db.connection.commit()
+            cur.close()
+            flash(f"Book added succesfully. Id = {book_id}", category="success")
+        elif "remove-book-copy" in request.form:
+            book_id = request.form.get("book_id")
+            cur = db.connection.cursor()
+            cur.execute(f"SELECT * FROM book_copies_per_school WHERE book_id='{book_id}' AND school_id='{school_id}' AND availability = 1")
+            result = cur.fetchone()
+            cur.close()
+            if result:
+                cur = db.connection.cursor()
+                cur.execute(f"DELETE FROM book_copies_per_school WHERE id = {result[0]}")
+                db.connection.commit()
+                cur.close()
+                flash(f"Book removed succesfully. Id = {book_id}", category="success")
+            else:
+                flash(f"Not available book copy to delete.", category="error")
+        elif "add-new-book" in request.form:
+            book_id = request.form.get("new_book_id")
+            cur = db.connection.cursor()
+            cur.execute(f"INSERT INTO book_copies_per_school (book_id, school_id) VALUES ('{book_id}', '{school_id}');")
+            db.connection.commit()
+            cur.close()
+            flash(f"New book added succesfully Id = {book_id}", category="success")
+        elif "insert-book" in request.form:
+            writer_input = request.form.get("writer_input")
+            title = request.form.get("title")
+            publisher = request.form.get("publisher")
+
+            if ',' in writer_input:
+                writers_mini_list = writer_input.split(',')
+            else:
+                writers_mini_list = []
+                writers_mini_list.append(writer_input)
+
+            for writer in writers_mini_list:
+                first_name = writer.strip().split(' ')[1:]
+                last_name = writer.strip().split(' ')[0]
+
+                #search if writer exists, if not insert it in the database
+                cur = db.connection.cursor()
+                search_writer = f"SELECT first_name, last_name from writer where first_name = '{first_name}' and last_name = '{last_name}';"
+                cur.execute(search_writer)
+                result = cur.fetchone()
+                cur.close()
+                if not result:
+                    cur = db.connection.cursor()
+                    writer_insertion_query = f"INSERT INTO writer (first_name, last_name) VALUES ('{first_name}', '{last_name}');"
+                    cur.execute(writer_insertion_query)
+                    db.connection.commit()
+                    cur.close()
+                
+                #get writer id
+                cur = db.connection.cursor()
+                id_writer_query = f"SELECT id FROM writer where first_name = '{first_name}' and last_name = '{last_name}';"
+                cur.execute(id_writer_query)
+                writer_id = cur.fetchone()
+                cur.close()
+            
+                cur = db.connection.cursor()
+                id_book_query = f"SELECT id FROM book where title = '{title}';"
+                cur.execute(id_book_query)
+                book_id = cur.fetchone()
+                cur.close()
+
+                cur = db.connection.cursor()
+                query = f"INSERT INTO book_writer (book_id, writer_id) VALUES ('{book_id}', '{writer_id}');"
+                cur.execute(query)
+                db.connection.commit()
+                cur.close()    
+      
+    query=f"""SELECT b.title, COUNT(bcps.id) AS copy_count, b.image, b.id FROM app_user AS au JOIN school AS s ON au.school = s.id JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id JOIN book AS b ON bcps.book_id = b.id WHERE au.id = {user_id} GROUP BY b.title ORDER BY copy_count DESC"""
+    cur = db.connection.cursor()
+    cur.execute(query)
+    infos = cur.fetchall()
+    cur.close()
+
+    image_url=[]
+    ids=[]
+               
+    for index, info in enumerate(infos):
+        ids.append(info[3]-1)        
+        image_url.append(url_for('static', filename=f'images/{ids[index]}.png'))
+    
+    cur = db.connection.cursor()
+    cur.execute(f"SELECT book.title, book.id FROM book WHERE id NOT IN ( SELECT book_id FROM book_copies_per_school WHERE school_id = {school_id});")
+    new_books = cur.fetchall()
+    cur.close()
+
+    new_book_image_url=[]
+    new_book_ids=[]
+    for index, book in enumerate(new_books):
+        new_book_ids.append(book[1]-1)        
+        new_book_image_url.append(url_for('static', filename=f'images/{new_book_ids[index]}.png'))
+
+    return render_template("manage-books.html", user=current_user, infos=infos, image_url=image_url, new_books=new_books, new_book_image_url=new_book_image_url, role=session["user_role"])

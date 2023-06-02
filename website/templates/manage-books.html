@@ -1,0 +1,104 @@
+{% extends "base.html" %}{% block title %}School Admin Page{% endblock %}{%
+block navbar %} {% if role == 'school_admin'%}
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="queries"
+    href="/queries"
+  >
+    Advanced Tools
+  </a>
+</li>
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="manage-books"
+    href="/manage-books"
+  >
+    Manage books
+  </a>
+</li>
+{% endif %} {% endblock %}{% block content %}
+<h3 align="center">Books in My School</h3>
+<ul>
+  {% for info in infos %}
+  <li class="product">
+    <div style="margin-right: 7px">
+      <img
+        src="{{image_url[loop.index0]}}"
+        alt="{{ info[0] }}"
+        width="50"
+      />
+    </div>
+    <div>
+      <h4><a href="/books/{{info[3]}}">{{ info[0] }}</a></h4>
+      <p>Number of Copies: {{ info[1] }}</p>
+      <form
+        action="/manage-books"
+        method="post"
+      >
+        <button
+          name="add-book-copy"
+          id="add-book-copy"
+          class="btn btn-primary btn-success"
+        >
+          +
+        </button>
+        <button
+          name="remove-book-copy"
+          id="remove-book-copy"
+          class="btn btn-primary btn-danger"
+        >
+          -
+        </button>
+        <input
+          type="hidden"
+          name="book_id"
+          value="{{info[3]}}"
+        />
+      </form>
+    </div>
+  </li>
+
+  {% endfor %}
+</ul>
+
+<h3 align="center">Other books in Database</h3>
+
+<ul>
+  {% for book in new_books %}
+  <li class="product">
+    <div style="margin-right: 7px">
+      <img
+        src="{{new_book_image_url[loop.index0]}}"
+        alt="{{ book[0] }}"
+        width="50"
+      />
+    </div>
+    <div>
+      <h4><a href="/books/{{book[1]}}">{{ book[0] }}</a></h4>
+      <p>Number of Copies: 0</p>
+      <form
+        action="/manage-books"
+        method="post"
+      >
+        <button
+          name="add-new-book"
+          id="add-new-book"
+          class="btn btn-primary btn-success"
+        >
+          +
+        </button>
+        <input
+          type="hidden"
+          name="new_book_id"
+          value="{{book[1]}}"
+        />
+      </form>
+    </div>
+  </li>
+
+  {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,11 +1,22 @@
 {% extends "base.html" %}{% block title %}Profile{% endblock %} {% block navbar
 %} {% if role == 'school_admin'%}
-<a
-  class="nav-link"
-  id="queries"
-  href="/queries"
-  >Advanced Tools</a
->
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="queries"
+    href="/queries"
+    >Advanced Tools</a
+  >
+</li>
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="manage-books"
+    href="/manage-books"
+  >
+    Manage books
+  </a>
+</li>
 {% endif %}{% endblock %}{% block content %}
 <h1 style="padding-top: 10px; color: #2b2020">
   {{info[0]}} {{info[1]}}'s Profile

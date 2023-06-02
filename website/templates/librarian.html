@@ -1,13 +1,22 @@
 {% extends "base.html" %}{% block title %}School Admin Page{% endblock %}{%
 block navbar %} {% if role == 'school_admin'%}
-<li class="nav-item"></li>
-<a
-  class="nav-link"
-  id="queries"
-  href="/queries"
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="queries"
+    href="/queries"
   >
-  Advanced Tools
-</a>
+    Advanced Tools
+  </a>
+</li>
+<li class="nav-item">
+  <a
+    class="nav-link"
+    id="manage-books"
+    href="/manage-books"
+  >
+    Manage books
+  </a>
 </li>
 {% endif %} {% endblock %}{% block content %}
 <h1 align="center">{{school}} Admin Page</h1>
@@ -58,18 +67,44 @@ block navbar %} {% if role == 'school_admin'%}
     <ul class="scrollbox">
       {% for order in book_orders %}
       <li class="section-item">
-        <b>{{order[1]}}</b><br>
+        <b>{{order[1]}}</b><br />
         <div class="comment-date">{{order[3]}}</div>
-        {{order[2]}}<br>
-        {{order[4]}} request<br>
-        <form action="/manage-rental" method="POST" style="display: inline" >
-          <input type="hidden" name="rental_id" value="{{ order[0] }}" />
-          <input type="hidden" name="rental_status" value="{{ order[4] }}" />
-          <input type="hidden" name="send_to" value="views.home" />
-          <button name="action" value="approve" type="submit" class="btn btn-sm btn-success" >
+        {{order[2]}}<br />
+        {{order[4]}} request<br />
+        <form
+          action="/manage-rental"
+          method="POST"
+          style="display: inline"
+        >
+          <input
+            type="hidden"
+            name="rental_id"
+            value="{{ order[0] }}"
+          />
+          <input
+            type="hidden"
+            name="rental_status"
+            value="{{ order[4] }}"
+          />
+          <input
+            type="hidden"
+            name="send_to"
+            value="views.home"
+          />
+          <button
+            name="action"
+            value="approve"
+            type="submit"
+            class="btn btn-sm btn-success"
+          >
             Approve
           </button>
-          <button name="action" value="disapprove" type="submit" class="btn btn-sm btn-danger" >
+          <button
+            name="action"
+            value="disapprove"
+            type="submit"
+            class="btn btn-sm btn-danger"
+          >
             Disapprove
           </button>
         </form>
@@ -88,7 +123,7 @@ block navbar %} {% if role == 'school_admin'%}
     <h6 style="text-align: left; text-decoration-line: underline">
       Late to Return
     </h6>
-    <ul class = "scrollbox">
+    <ul class="scrollbox">
       {% for user in late %}
       <li class="section-item">
         <b>{{user[1]}} {{user[2]}}</b><br />
