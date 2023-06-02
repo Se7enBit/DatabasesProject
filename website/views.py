@@ -213,8 +213,8 @@ def queries():
 
     #Get School users
     arg=""
-    if request.method=="POST" and "manage_user_name" in request.form:
-        name=request.form.get("manage_user_name")
+    if request.method=="POST" and "manage-user-name" in request.form:
+        name=request.form.get("manage-user-name")
         arg=f" AND username LIKE '%{name}%' OR first_name LIKE '%{name}%' OR last_name LIKE '%{name}%'"
     cur = db.connection.cursor()
     cur.execute(f"""SELECT id, username, first_name, last_name, user_role FROM app_user WHERE school={session['school_id']} AND is_active=1 AND user_role IN ('student', 'teacher'){arg} ORDER BY username;""")
@@ -251,8 +251,8 @@ def queries():
 
     #Manage Rentals
     arg=""
-    if request.method=="POST" and "rental_user_name" in request.form:
-        name=request.form.get("rental_user_name")
+    if request.method=="POST" and "rental-user-name" in request.form:
+        name=request.form.get("rental-user-name")
         arg=f" AND u.username LIKE '%{name}%'"
     cur = db.connection.cursor()
     cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.rental_datetime, br.book_copy_id FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1{arg};""")
