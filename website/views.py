@@ -46,7 +46,7 @@ def home():
             j=0
             #[13] gives the status
             for rented_book in rented_books:
-                if rented_book[13] == "rented":
+                if rented_book[13] in ("rented", "reservation", "late to return"):
                     ids_rented.append(rented_book[0]-1)
                     img_for_rented.append(url_for('static', filename=f'images/{ids_rented[i]}.png'))
                     i = i+1
@@ -196,12 +196,6 @@ def queries():
         return redirect(url_for("views.admin"))
     if session["user_role"] != "school_admin":
         return redirect(url_for("views.home"))
-    
-    #Search by name
-    arg=""
-    if request.method=="POST" and "name" in request.form:
-        name=request.form.get("name")
-        arg=f" AND u.username LIKE '%{name}%'"
 
     cur= db.connection.cursor()
     cur.execute("SELECT DISTINCT category FROM book;")
@@ -215,18 +209,52 @@ def queries():
     session["categories"] = categories
 
     #Get School users
+    arg=""
+    if request.method=="POST" and "manage_user_name" in request.form:
+        name=request.form.get("manage_user_name")
+        arg=f" AND username LIKE '%{name}%' OR first_name LIKE '%{name}%' OR last_name LIKE '%{name}%'"
     cur = db.connection.cursor()
-    cur.execute(f"""SELECT id, username FROM app_user WHERE school="{session['school_id']}" ORDER BY username;""")
+    cur.execute(f"""SELECT id, username, first_name, last_name, user_role FROM app_user WHERE school={session['school_id']} AND is_active=1 AND user_role IN ('student', 'teacher'){arg} ORDER BY username;""")
     school_users = cur.fetchall()
     session["school_users"]=[]
     for user in school_users: session["school_users"].append(user)
-    cur.close()
-    
+    cur.close()  
+
+    #Deactivate / Delete User
+    if request.method=="POST" and "user-action" in request.form:
+        user_id = request.form.get("user-id")
+        action=None
+        message=None
+        if request.form.get("user-action") == "deactivate":
+            action=f"UPDATE app_user SET is_active=0 WHERE id={user_id}"
+            message=f"User {user_id} DEACTIVATED successfully"
+        elif request.form.get("user-action") == "delete":
+            #Check if user has active rentals
+            cur = db.connection.cursor()
+            cur.execute(f"""SELECT id FROM book_rental WHERE app_user_id={user_id} AND rental_status IN ("rented", "reservation", "late to return")""")
+            user_book_rentals = cur.fetchall()
+            cur.close()
+            if len(user_book_rentals) > 0:
+                flash("To delete this user there must be no active rentals or reservations", category='error')
+            else:
+                action=f"DELETE FROM app_user WHERE id={user_id}"
+                message=f"User {user_id} DELETED successfully"
+        if action and message:
+            cur = db.connection.cursor()
+            cur.execute(action)
+            db.connection.commit()
+            cur.close()
+            flash(message, category="success")
+
     #Manage Rentals
+    arg=""
+    if request.method=="POST" and "rental_user_name" in request.form:
+        name=request.form.get("rental_user_name")
+        arg=f" AND u.username LIKE '%{name}%'"
     cur = db.connection.cursor()
-    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1{arg};""")
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.rental_datetime, br.book_copy_id FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='rented' AND br.is_active=1{arg};""")
     rented_books = cur.fetchall()
-    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.request_datetime FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='reservation' AND br.is_active=1{arg};""")
+    cur.execute(f"""SELECT br.id AS rental_id, u.username, b.title, br.reservation_datetime, br.book_copy_id FROM book_rental br JOIN app_user u ON u.id=br.app_user_id JOIN book b ON b.id=br.book_id WHERE u.school={session["school_id"]} AND br.rental_status='reservation' AND br.is_active=1{arg};""")
     reserved_books = cur.fetchall()
     cur.close()
 
