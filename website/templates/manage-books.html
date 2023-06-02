@@ -19,6 +19,129 @@ block navbar %} {% if role == 'school_admin'%}
   </a>
 </li>
 {% endif %} {% endblock %}{% block content %}
+<form
+  method="POST"
+  action="/manage-books"
+>
+  <h3 align="center">Insert Book</h3>
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input
+      type="text"
+      class="form-control"
+      id="title"
+      name="title"
+      placeholder="Enter title"
+    />
+  </div>
+  <div class="form-group">
+    <label for="writer_input">Writer(s)</label>
+    <input
+      type="text"
+      class="form-control"
+      id="writer_input"
+      name="writer_input"
+      placeholder="Enter writer(s)"
+    />
+  </div>
+  <div class="form-group">
+    <label for="lang">Language</label>
+    <select
+      class="form-control"
+      id="lang"
+      name="lang"
+    >
+      <option value="Greek">Greek</option>
+      <option value="English">English</option>
+      <option value="French">French</option>
+      <option value="German">German</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="publisher">Publisher</label>
+    <input
+      type="text"
+      class="form-control"
+      id="publisher"
+      name="publisher"
+      placeholder="Enter publisher"
+    />
+  </div>
+  <div class="form-group">
+    <label for="isbn">ISBN</label>
+    <input
+      type="number"
+      class="form-control"
+      id="isbn"
+      name="isbn"
+      placeholder="Enter ISBN"
+    />
+  </div>
+  <div class="form-group">
+    <label for="number_of_pages">Number of pages</label>
+    <input
+      type="number"
+      class="form-control"
+      id="number_of_pages"
+      name="number_of_pages"
+      placeholder="Enter Number of pages"
+    />
+  </div>
+  <div class="form-group">
+    <label for="categories">Categories</label>
+    <input
+      type="text"
+      class="form-control"
+      id="categories"
+      name="categories"
+      placeholder="Enter categories separated with comma (,)"
+    />
+  </div>
+  <br />
+  <div class="form-group">
+    <label for="abstract">Abstract</label>
+    <input
+      type="text"
+      class="form-control"
+      id="abstract"
+      name="abstract"
+      placeholder="Enter abstract"
+    />
+  </div>
+  <div class="form-group">
+    <label for="keywords">Keywords</label>
+    <input
+      type="text"
+      class="form-control"
+      id="keywords"
+      name="keywords"
+      placeholder="Enter keywords separated with comma (,)"
+    />
+  </div>
+  <div class="form-group">
+    <label for="image">Image</label>
+    <input
+      type="text"
+      class="form-control"
+      id="image"
+      name="image"
+      placeholder="Upload Image"
+    />
+  </div>
+  <div
+    class="form-group"
+    style="background-color: white; border-color: white"
+  >
+    <button
+      type="submit"
+      class="btn btn-primary"
+      name="insert-book"
+    >
+      Insert
+    </button>
+  </div>
+</form>
+
 <h3 align="center">Books in My School</h3>
 <ul>
   {% for info in infos %}
@@ -100,5 +223,87 @@ block navbar %} {% if role == 'school_admin'%}
 
   {% endfor %}
 </ul>
+<script>
+  document.getElementById("title").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the title field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document.getElementById("writer_full").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the writer(s) field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document.getElementById("publisher").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the publisher field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document.getElementById("isbn").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "" || value <= 0) {
+      this.setCustomValidity("Please fill in the isbn field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document.getElementById("abstract").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the abstract field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document.getElementById("keywords").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the keywords field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
+<script>
+  document
+    .getElementById("number_of_pages")
+    .addEventListener("input", function () {
+      var value = parseInt(this.value);
+      if (isNaN(value) || value == "" || value <= 0) {
+        this.setCustomValidity("Please fill in the number of pages field.");
+      } else {
+        this.setCustomValidity("");
+      }
+    });
+</script>
+<script>
+  document.getElementById("categories").addEventListener("input", function () {
+    var value = parseInt(this.value);
+    if (isNaN(value) || value == "") {
+      this.setCustomValidity("Please fill in the categories field.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>
 
 {% endblock %}

@@ -606,6 +606,37 @@ def manage_books():
             writer_input = request.form.get("writer_input")
             title = request.form.get("title")
             publisher = request.form.get("publisher")
+            isbn = request.form.get("isbn")
+            number_of_pages = request.form.get("number_of_pages")
+            abstract = request.form.get("abstract")
+            lang = request.form.get("lang")
+            keywords = request.form.get("keywords")
+
+            image = request.form.get("image")
+            categories = request.form.get("categories")
+
+            try:
+                cur = db.connection.cursor()
+                book_insertion = f"INSERT INTO book (title, publisher, isbn, number_of_pages, category, abstract, image, keywords, lang) VALUES ('{title}', '{publisher}', '{isbn}', '{number_of_pages}', '{categories}', '{abstract}', 'url','{keywords}', '{lang}');"
+                cur.execute(book_insertion)
+                db.connection.commit()
+                cur.close()
+
+                cur = db.connection.cursor()
+                get_book_id = f"SELECT id from book WHERE title='{title};'"
+                cur.execute(get_book_id)
+                book_id = cur.fetchone()
+                cur.close()
+                
+                image_id = book_id-1
+                #save image in static/images/{image_id}.png and in ./images/{image_id}.png #
+                """ here """
+
+            except db.connection.IntegrityError:
+                db.connection.rollback()
+                cur.close()
+                flash("Invalid inputs.", category="error")
+                return redirect(url_for('views.manage_books'))
 
             if ',' in writer_input:
                 writers_mini_list = writer_input.split(',')
@@ -636,18 +667,19 @@ def manage_books():
                 cur.execute(id_writer_query)
                 writer_id = cur.fetchone()
                 cur.close()
-            
-                cur = db.connection.cursor()
-                id_book_query = f"SELECT id FROM book where title = '{title}';"
-                cur.execute(id_book_query)
-                book_id = cur.fetchone()
-                cur.close()
 
+                #insert book_writer
                 cur = db.connection.cursor()
                 query = f"INSERT INTO book_writer (book_id, writer_id) VALUES ('{book_id}', '{writer_id}');"
                 cur.execute(query)
                 db.connection.commit()
-                cur.close()    
+                cur.close()
+
+            #insert a book copy in the school library
+            """ here """
+
+            flash("Book inserted succesfully.", category="success")
+            return redirect(url_for("views.manage_books"))  
       
     query=f"""SELECT b.title, COUNT(bcps.id) AS copy_count, b.image, b.id FROM app_user AS au JOIN school AS s ON au.school = s.id JOIN book_copies_per_school AS bcps ON s.id = bcps.school_id JOIN book AS b ON bcps.book_id = b.id WHERE au.id = {user_id} GROUP BY b.title ORDER BY copy_count DESC"""
     cur = db.connection.cursor()
