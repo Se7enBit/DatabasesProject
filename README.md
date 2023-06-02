@@ -53,7 +53,7 @@ python3 main.py
 Each user of the application has the ability to login or sign up for the application.
 
 ![Login](./readme_images/login.png)
-![Sign Up](./read_images/sign_up.png)
+![Sign Up](./readme_images/sign_up.png)
 
 ### Student or Teacher
 
