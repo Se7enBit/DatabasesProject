@@ -617,7 +617,7 @@ def manage_books():
 
             try:
                 cur = db.connection.cursor()
-                book_insertion = f"INSERT INTO book (title, publisher, isbn, number_of_pages, category, abstract, image, keywords, lang) VALUES ('{title}', '{publisher}', '{isbn}', '{number_of_pages}', '{categories}', '{abstract}', 'url','{keywords}', '{lang}');"
+                book_insertion = f"INSERT INTO book (title, publisher, isbn, number_of_pages, category, abstract, image, keywords, lang) VALUES ('{title}', '{publisher}', '{isbn}', '{number_of_pages}', '{categories}', '{abstract}', '{image}','{keywords}', '{lang}');"
                 cur.execute(book_insertion)
                 db.connection.commit()
                 cur.close()
