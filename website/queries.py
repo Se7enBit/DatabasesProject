@@ -228,8 +228,11 @@ def rent_book():
     mycursor.execute(f'SELECT school FROM app_user WHERE id = {app_user_id}')
 
     print("Calling book_rental_runner")
-    br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
-    flash("Your request has been submitted. Please wait for your school admin to approve it.", category="warning")
+    success = br.book_rental_runner(app_user_id, requested_book_id, action, school, mycursor, mydb)
+    if success:
+      flash("Your request has been submitted. Please wait for your school admin to approve it.", category="warning")
+    else:
+      flash("Rental request not submitted.", category="error")
     return redirect(url_for("views.home"))
 
 @queries.route("/manage-rental", methods=["POST"])
