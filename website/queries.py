@@ -247,6 +247,7 @@ def manage_rental():
     cur.execute(f"UPDATE book_rental SET is_active=1 WHERE book_rental.id={rental_id}")
     db.connection.commit()
     cur.close()
+    flash("Action performed succesfully", category="success")
 
   elif request.form.get("action")=="disapprove":
     if rental_status == "rented":
@@ -257,6 +258,7 @@ def manage_rental():
     cur.execute(f"UPDATE book_rental SET is_active=1, rental_status='{new_status}' WHERE book_rental.id={rental_id}")
     db.connection.commit()
     cur.close()
+    flash("Action performed succesfully", category="success")
 
   elif request.form.get("action")=="return":
     mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
@@ -265,7 +267,11 @@ def manage_rental():
     result=mycursor.fetchall()
     user_id=result[0][0]
     book_id=result[0][1]
-    br.book_rental_runner(user_id, book_id, 'returned', session["school_id"], mycursor, mydb)
+    success = br.book_rental_runner(user_id, book_id, 'returned', session["school_id"], mycursor, mydb)
+    if success:
+      flash("Action performed succesfully", category="success")
+    else:
+      flash("Action was not performed", category="error")
     
   elif request.form.get("action")=="rent":
     mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
@@ -274,7 +280,11 @@ def manage_rental():
     result=mycursor.fetchall()
     user_id=result[0][0]
     book_id=result[0][1]
-    br.book_rental_runner(user_id, book_id, 'rented', session["school_id"], mycursor, mydb)
+    success = br.book_rental_runner(user_id, book_id, 'rented', session["school_id"], mycursor, mydb)
+    if success:
+      flash("Action performed succesfully", category="success")
+    else:
+      flash("Action was not performed", category="error")
 
   elif request.form.get("action")=="cancel":
     mydb = mysql.connector.connect(host = 'localhost', user = 'root', database = 'school_library')
@@ -285,9 +295,12 @@ def manage_rental():
     book_id=result[0][1]
     print(result)
     print(rental_id)
-    br.book_rental_runner(user_id, book_id, 'cancelled', session["school_id"], mycursor, mydb)
+    success = br.book_rental_runner(user_id, book_id, 'cancelled', session["school_id"], mycursor, mydb)
+    if success:
+      flash("Action performed succesfully", category="success")
+    else:
+      flash("Action was not performed", category="error")
 
-  flash("Action performed succesfully", category="success")
   return redirect(url_for(came_from))
 
 @queries.route('/backup')

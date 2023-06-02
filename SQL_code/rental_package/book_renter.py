@@ -366,13 +366,13 @@ def return_book(app_user_id, requested_book, rental_status, school, mycursor, my
 
 def book_rental_runner(app_user_id, requested_book, action, school, mycursor, mydb):
     if action in ('rented', 'reservation'):
-        rent_reserve_book(app_user_id, requested_book, action, school, mycursor, mydb)
+        return rent_reserve_book(app_user_id, requested_book, action, school, mycursor, mydb)
 
     elif action == 'returned':
-        return_book(app_user_id, requested_book, action, school, mycursor, mydb)
+        return return_book(app_user_id, requested_book, action, school, mycursor, mydb)
 
     elif action == 'cancelled':
-        cancel_book(app_user_id, requested_book, action, school, mycursor, mydb)
+        return cancel_book(app_user_id, requested_book, action, school, mycursor, mydb)
 
 
 def set_late_to_return_rental_status_scheduled(mycursor, mydb):
