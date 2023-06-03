@@ -102,7 +102,32 @@
         </button>
       </div>
     </form>
+    {% endif %}
+    <form
+      method="POST"
+      action="/profile"
+    >
+      <label for="password">Old Password:</label>
+      <input
+        type="text"
+        id="password"
+        name="password"
+        required
+      />
+      <label for="password2">New Password:</label>
+      <input
+        type="text"
+        id="password2"
+        name="password2"
+      />
+      <button
+        type="submit"
+        name="change-password"
+        class="btn btn-primary"
+      >
+        Change Password
+      </button>
+    </form>
   </div>
-  {% endif %}
 </div>
 {% endblock %}

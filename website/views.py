@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, jsonify, url_for, session, redirect, send_file
 from flask_login import login_required, current_user
 from . import db
-import json, base64, os
+import json, base64, os, hashlib
 from datetime import datetime, date
 
 views = Blueprint("views", __name__)
@@ -407,6 +407,30 @@ def profile():
                 cur.close()
 
                 session["username"]= new_username
+        
+        if "change-password" in request.form:
+            old_password=request.form.get("password")
+            new_password=request.form.get("password2")
+        
+            md5_password = hashlib.md5(old_password.encode()).hexdigest()
+            user_id = current_user.get_id()
+            cur = db.connection.cursor()
+            cur.execute(f"SELECT * FROM app_user WHERE id = {user_id} AND userpassword = '{md5_password}';")
+            result = cur.fetchone()
+            cur.close
+            if result:
+                cur = db.connection.cursor()
+                cur.execute("UPDATE app_user SET userpassword = md5(%s) WHERE id = '%s';", [new_password, user_id])
+                db.connection.commit()
+                cur.close
+                flash("Password updated succesfully.", category="success")
+                return redirect(url_for('views.profile'))
+                
+            else:
+                flash("Invalid password.", category="error")
+                return redirect(url_for('views.profile'))
+
+
         
         flash("Info updated succesfully.", category="success")
         return redirect(url_for('views.home'))
