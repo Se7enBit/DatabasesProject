@@ -1,12 +1,78 @@
-# DatabasesProject
+# School Library
 
-Databases Semester Project
+This is a full stack website project. We created a library network
+that allows users to rent or reserve books out of a database of books.
+It has login and signup capabilities. You can also rate and comment on the titles available for you.
+
+Most of the data was generated randomly and the books where scrapped from
+a website.
+
+## Stack
+
+-Python
+-Jupyter
+-Flask
+-MySQL
+-XAMPP
+-CSS
+-Javascript
+
+## Installation
+
+Install [MySQL Server](https://dev.mysql.com/downloads/mysql/) and [XAMPP](https://www.apachefriends.org/)
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all packages.
+
+```bash
+pip3 install flask,flask_login,flask_mysqldb,mysql,mysql.connector,werkzeug 
+```
+
+Clone our repository.
+
+```bash
+git clone https://github.com/Se7enBit/DatabasesProject.git
+```
+
+Open a terminal and start a MySQL Server instance.
+Source the run.sql file on the running instance.
+
+```bash
+source SQL_code/new_and_improved/run.sql;
+```
+
+This initializes the database with all insertions.
+
+Now on the root directory of the file try you can run main.py
+ 
+```bash
+python3 main.py
+```
+
+## User Manual
+
+Each user of the application has the ability to login or sign up for the application.
+
+![Login](./readme_images/login.png)
+![Sign Up](./readme_images/sign_up.png)
+
+### Student or Teacher
+
+As a student or teacher you can rent or reserve books that are shown in the catalog.
+
+![Catalog](./readme_images/catalog.png)
+
+Once you've picked a book that you like, you're redirected to the book's home page where
+you can rent or reserve it, view more information on it, comment and rate it.
+
+![Book Home Page 1](./readme_images/arduino_1.png)
+
+![Book Home Page 2](./readme_images/arduino_2.png)
 
 Finally you can view your rentals and reservations from your main page.
 
 ![My Books](./readme_images/my_books.png)
 
-redirect(url_for("views.home")) is used to redirect the user to a different page in your Flask application. When the user accesses the page containing this code, they will be immediately redirected to the specified page, which in this case is the home view function in the views module. This is useful when you want to force the user to go to a different page, for example after they have submitted a form or when they are not authorized to access a certain page.
+### School Admin
 
 As a School Administrator you can publish comments that the users post, allow for rentals or reservations
 and also activate or deactive users. You will also be notified if a user hasn't returned a book on time.
@@ -14,3 +80,26 @@ and also activate or deactive users. You will also be notified if a user hasn't 
 ![School Admin 1](./readme_images/school_admin_1.png)
 
 ![School Admin 2](./readme_images/school_admin_2.png)
+
+The school admin can manage all users and their statuses.
+
+![School Admin 3](./readme_images/manage_users_1.png)
+
+He also has a complete overview of their rentals and reservations 
+
+![School Admin 4](./readme_images/manage_rent_reserve.png)
+
+## General Admin
+
+The general admin can add school admins and schools to the Database
+
+![General Admin 1](./readme_images/insert_librarian.png)
+
+![General Admin 2](./readme_images/insert_school.png)
+
+He can create a backup of the database and also has some special tools.
+
+![General Admin 3](./readme_images/backup_database.png)
+
+![General Admin 4](./readme_images/general_admin_adv_tools.png)
+
